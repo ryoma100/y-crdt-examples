@@ -1,1 +1,1 @@
-# y-crdt-examples
+# y-crdt-editor-examples
