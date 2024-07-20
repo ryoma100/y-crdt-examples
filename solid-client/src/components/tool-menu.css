@@ -1,0 +1,57 @@
+.tool-menu {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border: solid 1px gray;
+  border-radius: 9px;
+  padding-left: 2px;
+  padding-right: 2px;
+  width: 186px;
+  background-color: white;
+  margin: 8px 0 0 8px;
+}
+
+.tool-menu__item {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 4px 2px 4px 2px;
+}
+
+.tool-menu__radio {
+  margin: 0;
+  padding: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.tool-menu__label {
+  width: 24px;
+  height: 24px;
+}
+
+.tool-menu__radio:checked + div {
+  background-color: lightgray;
+  border-radius: 5px;
+}
+
+.tool-menu__radio:hover + div {
+  background-color: #c0c0c0;
+}
+
+.tool-menu__img {
+  width: 24px;
+  height: 24px;
+}
+
+.tool-menu__line {
+  margin-left: 2px;
+  margin-right: 2px;
+  width: 1px;
+  height: 40px;
+  background-color: gray;
+}
