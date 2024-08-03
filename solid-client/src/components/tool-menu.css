@@ -7,7 +7,7 @@
   border-radius: 9px;
   padding-left: 2px;
   padding-right: 2px;
-  width: 186px;
+  width: 230px;
   background-color: white;
   margin: 8px 0 0 8px;
 }
@@ -19,6 +19,7 @@
   justify-content: center;
   align-items: center;
   margin: 4px 2px 4px 2px;
+  cursor: pointer;
 }
 
 .tool-menu__radio {
@@ -32,6 +33,7 @@
 .tool-menu__label {
   width: 24px;
   height: 24px;
+  cursor: pointer;
 }
 
 .tool-menu__radio:checked + div {

@@ -1,0 +1,14 @@
+.edge {
+  fill: none;
+  stroke-width: 4;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+}
+
+.edge--unselected {
+  stroke: lightgray;
+}
+
+.edge--selected {
+  stroke: var(--selected-color);
+}
