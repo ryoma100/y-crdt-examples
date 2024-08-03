@@ -1,24 +1,22 @@
 import { JSXElement } from "solid-js";
-import { GraphEdge, GraphNode } from "../data-model/data-type";
 
 import { useGraphContext } from "../context";
+import { GraphEdge } from "../data-model/data-type";
+
 import "./edge.css";
 
-export function Edge(props: {
-  edge: GraphEdge;
-  nodeList: GraphNode[];
-}): JSXElement {
+export function Edge(props: { edge: GraphEdge }): JSXElement {
   const model = useGraphContext();
+  const nodeList = model.graphStore.nodeList;
 
   const fromNode = () =>
-    props.nodeList.find((it) => it.id === props.edge.startNodeId)!;
-  const toNode = () =>
-    props.nodeList.find((it) => it.id === props.edge.endNodeId)!;
+    nodeList.find((it) => it.id === props.edge.startNodeId)!;
+  const toNode = () => nodeList.find((it) => it.id === props.edge.endNodeId)!;
 
-  const handleMouseDown = (e: MouseEvent) => {
+  function handleMouseDown(e: MouseEvent) {
     e.stopPropagation();
     model.selectEdge(props.edge.id);
-  };
+  }
 
   return (
     <>

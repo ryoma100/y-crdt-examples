@@ -9,23 +9,23 @@ import "./diagram.css";
 export function Diagram(): JSXElement {
   const model = useGraphContext();
 
-  const handleMouseDown = (e: MouseEvent) => {
+  function handleMouseDown(e: MouseEvent) {
     model.clearSelect();
     if (model.toolbarMode() === "addNode") {
       model.addNode(e.clientX, e.clientY);
     }
-  };
+  }
 
-  const handleMouseMove = (e: MouseEvent) => {
+  function handleMouseMove(e: MouseEvent) {
     if (model.dragMode() === "drag") {
       model.dragMove(e.movementX, e.movementY);
     }
     if (model.addingEdgeLine() != null) {
       model.addEdgeMove(e.clientX, e.clientY);
     }
-  };
+  }
 
-  const handleMouseUp = () => {
+  function handleMouseUp() {
     switch (model.toolbarMode()) {
       case "pointer":
       case "addNode":
@@ -35,7 +35,7 @@ export function Diagram(): JSXElement {
         model.addEdgeEnd();
         break;
     }
-  };
+  }
 
   return (
     <svg
@@ -45,9 +45,7 @@ export function Diagram(): JSXElement {
       onMouseUp={handleMouseUp}
     >
       <g data-id="edges">
-        <For each={model.graphStore.edgeList}>
-          {(edge) => Edge({ edge, nodeList: model.graphStore.nodeList })}
-        </For>
+        <For each={model.graphStore.edgeList}>{(edge) => Edge({ edge })}</For>
       </g>
       <g data-id="nodes">
         <For each={model.graphStore.nodeList}>{(node) => Node({ node })}</For>

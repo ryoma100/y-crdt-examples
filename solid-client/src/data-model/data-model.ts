@@ -1,5 +1,6 @@
 import { batch, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
+
 import { createDefaultGraph, createEdge, createNode } from "./data-factory";
 import { EdgeId, Graph, GraphNode, NodeId, Point } from "./data-type";
 
@@ -16,35 +17,35 @@ export function makeDataModel() {
     endPoint: Point;
   } | null>(null);
 
-  const selectNode = (nodeId: NodeId) => {
+  function selectNode(nodeId: NodeId) {
     batch(() => {
       setGraphStore("nodeList", (node) => node.selected, "selected", false);
       setGraphStore("nodeList", (node) => node.id === nodeId, "selected", true);
       setGraphStore("edgeList", (edge) => edge.selected, "selected", false);
     });
-  };
+  }
 
-  const selectEdge = (edgeId: EdgeId) => {
+  function selectEdge(edgeId: EdgeId) {
     batch(() => {
       setGraphStore("nodeList", (node) => node.selected, "selected", false);
       setGraphStore("edgeList", (edge) => edge.selected, "selected", false);
       setGraphStore("edgeList", (edge) => edge.id === edgeId, "selected", true);
     });
-  };
+  }
 
-  const clearSelect = () => {
+  function clearSelect() {
     batch(() => {
       setGraphStore("nodeList", (node) => node.selected, "selected", false);
       setGraphStore("edgeList", (edge) => edge.selected, "selected", false);
     });
-  };
+  }
 
-  const dragStart = (nodeId: NodeId) => {
+  function dragStart(nodeId: NodeId) {
     selectNode(nodeId);
     setDragMode("drag");
-  };
+  }
 
-  const dragMove = (movementX: number, movementY: number) => {
+  function dragMove(movementX: number, movementY: number) {
     setGraphStore(
       "nodeList",
       (node) => node.selected,
@@ -54,18 +55,18 @@ export function makeDataModel() {
         y: node.y + movementY,
       })
     );
-  };
+  }
 
-  const dragEnd = () => {
+  function dragEnd() {
     setDragMode("none");
-  };
+  }
 
-  const addNode = (x: number, y: number) => {
+  function addNode(x: number, y: number) {
     const node = createNode(x, y, true);
     setGraphStore("nodeList", graphStore.nodeList.length, node);
-  };
+  }
 
-  const addEdgeStart = (node: GraphNode) => {
+  function addEdgeStart(node: GraphNode) {
     clearSelect();
     const point = {
       x: node.x + node.width / 2,
@@ -76,16 +77,16 @@ export function makeDataModel() {
       startPoint: point,
       endPoint: point,
     });
-  };
+  }
 
-  const addEdgeMove = (x: number, y: number) => {
+  function addEdgeMove(x: number, y: number) {
     const line = addingEdgeLine();
     if (line != null) {
       setAddingEdgeLine({ ...line, endPoint: { x, y } });
     }
-  };
+  }
 
-  const addEdgeEnd = (node: GraphNode | null = null) => {
+  function addEdgeEnd(node: GraphNode | null = null) {
     const line = addingEdgeLine();
     if (line != null && node != null && line.startNodeId != node.id) {
       if (
@@ -100,9 +101,9 @@ export function makeDataModel() {
       }
     }
     setAddingEdgeLine(null);
-  };
+  }
 
-  const removeSelected = () => {
+  function removeSelected() {
     batch(() => {
       graphStore.nodeList
         .filter((node) => node.selected)
@@ -124,7 +125,7 @@ export function makeDataModel() {
         graphStore.nodeList.filter((node) => !node.selected)
       );
     });
-  };
+  }
 
   return {
     graphStore,

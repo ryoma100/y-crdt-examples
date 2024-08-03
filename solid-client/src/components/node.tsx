@@ -1,6 +1,8 @@
 import { JSXElement, createSignal } from "solid-js";
+
 import { useGraphContext } from "../context";
 import { GraphNode } from "../data-model/data-type";
+
 import "./node.css";
 
 export function Node(props: { node: GraphNode }): JSXElement {
@@ -8,29 +10,27 @@ export function Node(props: { node: GraphNode }): JSXElement {
 
   const [readonly, setReadonly] = createSignal(true);
 
-  const handleDblClick = () => {
+  function handleDblClick() {
     setReadonly(false);
-    if (textareaRef != null) {
-      textareaRef.select();
-    }
-  };
+    textareaRef?.select();
+  }
 
-  const handleFocusOut = () => {
+  function handleFocusOut() {
     setTimeout(() => {
       // Wait a moment to deselect textarea.
       textareaRef?.setSelectionRange(0, 0);
       setReadonly(true);
     }, 0);
-  };
+  }
 
-  const handleKeyDown = (e: KeyboardEvent) => {
+  function handleKeyDown(e: KeyboardEvent) {
     if (!readonly() && e.key === "Escape") {
       e.stopPropagation();
       handleFocusOut();
     }
-  };
+  }
 
-  const handleMouseDown = (e: MouseEvent) => {
+  function handleMouseDown(e: MouseEvent) {
     e.stopPropagation();
     if (!readonly()) return;
 
@@ -43,13 +43,13 @@ export function Node(props: { node: GraphNode }): JSXElement {
         model.addEdgeStart(props.node);
         break;
     }
-  };
+  }
 
-  const handleMouseUp = () => {
+  function handleMouseUp() {
     if (model.toolbarMode() === "addEdge") {
       model.addEdgeEnd(props.node);
     }
-  };
+  }
 
   let textareaRef: HTMLTextAreaElement | undefined;
   return (

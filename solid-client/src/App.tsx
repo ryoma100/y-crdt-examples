@@ -8,11 +8,11 @@ export type MouseMode = "pointer" | "addNode" | "addEdge";
 function App() {
   const model = useGraphContext();
 
-  const handleKeyDown = (e: KeyboardEvent) => {
+  function handleKeyDown(e: KeyboardEvent) {
     if (e.key === "Escape") {
       model.setToolbarMode("pointer");
     }
-  };
+  }
 
   return (
     <div class="container" tabIndex={-1} onKeyDown={handleKeyDown}>
