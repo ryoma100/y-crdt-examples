@@ -73,6 +73,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
       >
         <textarea
           ref={textareaRef}
+          name="textarea"
           class="node__textarea"
           classList={{
             "node__textarea--readonly": readonly(),
