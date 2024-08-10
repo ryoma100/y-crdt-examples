@@ -1,94 +1,186 @@
+import { createSignal } from "solid-js";
 import { useGraphContext } from "../context";
 
+import { createSampleGraph } from "../data-model/data-factory";
 import "./tool-menu.css";
 
 export function ToolMenu() {
-  const model = useGraphContext();
+  const {
+    dataModel,
+    yjsReducer: { provider, dispatch },
+  } = useGraphContext();
+  const [online, setOnline] = createSignal(true);
+
+  function handleOnlineClick() {
+    setOnline(true);
+    provider.connect();
+  }
+
+  function handleOfflineClick() {
+    setOnline(false);
+    provider.disconnect();
+  }
+
+  function handleLoadSampleClick() {
+    const { nodeList, edgeList } = createSampleGraph();
+    dispatch({ type: "load", nodeList, edgeList });
+  }
 
   return (
-    <div class="tool-menu">
-      <input
-        type="radio"
-        name="toolbar"
-        id="toolbar-point"
-        class="tool-menu__radio"
-        value="pointer"
-        checked={model.toolbarMode() === "pointer"}
-        onChange={() => model.setToolbarMode("pointer")}
-      />
-      <div class="tool-menu__item">
-        <label title="Point" for="toolbar-point" class="tool-menu__label">
+    <div class="tool-menu__container">
+      <div class="tool-menu">
+        <input
+          type="radio"
+          name="toolbar"
+          id="toolbar-point"
+          class="tool-menu__radio"
+          value="pointer"
+          checked={dataModel.toolbarMode() === "pointer"}
+          onChange={() => dataModel.setToolbarMode("pointer")}
+        />
+        <div class="tool-menu__item">
+          <label title="Point" for="toolbar-point" class="tool-menu__label">
+            <img
+              src="arrow_selector_tool_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
+              class="tool-menu__img"
+            />
+          </label>
+        </div>
+
+        <input
+          type="radio"
+          name="toolbar"
+          id="toolbar-node"
+          class="tool-menu__radio"
+          value="addNode"
+          checked={dataModel.toolbarMode() === "addNode"}
+          onChange={() => dataModel.setToolbarMode("addNode")}
+        />
+        <div class="tool-menu__item">
+          <label title="Node" for="toolbar-node" class="tool-menu__label">
+            <img
+              src="check_box_outline_blank_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
+              class="tool-menu__img"
+            />
+          </label>
+        </div>
+
+        <input
+          type="radio"
+          name="toolbar"
+          id="toolbar-edge"
+          class="tool-menu__radio"
+          value="addEdge"
+          checked={dataModel.toolbarMode() === "addEdge"}
+          onChange={() => dataModel.setToolbarMode("addEdge")}
+        />
+        <div class="tool-menu__item">
+          <label title="Edge" for="toolbar-edge" class="tool-menu__label">
+            <img
+              src="north_east_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
+              class="tool-menu__img"
+            />
+          </label>
+        </div>
+
+        <div class="tool-menu__line" />
+
+        <button
+          class="tool-menu__item"
+          title="Delete"
+          onClick={() => dataModel.removeSelected()}
+        >
           <img
-            src="arrow_selector_tool_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
+            src="delete_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
             class="tool-menu__img"
           />
-        </label>
-      </div>
+        </button>
 
-      <input
-        type="radio"
-        name="toolbar"
-        id="toolbar-node"
-        class="tool-menu__radio"
-        value="addNode"
-        checked={model.toolbarMode() === "addNode"}
-        onChange={() => model.setToolbarMode("addNode")}
-      />
-      <div class="tool-menu__item">
-        <label title="Node" for="toolbar-node" class="tool-menu__label">
+        <div class="tool-menu__line" />
+
+        <button
+          class="tool-menu__item"
+          title="Undo"
+          onClick={() => dispatch({ type: "undo" })}
+        >
           <img
-            src="check_box_outline_blank_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
+            src="undo_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
             class="tool-menu__img"
           />
-        </label>
-      </div>
+        </button>
 
-      <input
-        type="radio"
-        name="toolbar"
-        id="toolbar-edge"
-        class="tool-menu__radio"
-        value="addEdge"
-        checked={model.toolbarMode() === "addEdge"}
-        onChange={() => model.setToolbarMode("addEdge")}
-      />
-      <div class="tool-menu__item">
-        <label title="Edge" for="toolbar-edge" class="tool-menu__label">
+        <button
+          class="tool-menu__item"
+          title="Redo"
+          onClick={() => dispatch({ type: "redo" })}
+        >
           <img
-            src="north_east_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
+            src="redo_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
             class="tool-menu__img"
           />
-        </label>
+        </button>
       </div>
+      <div class="tool-menu">
+        <button
+          class="tool-menu__item"
+          title="Initialize"
+          onClick={() => dispatch({ type: "init" })}
+        >
+          <img
+            src="new_window_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
+            class="tool-menu__img"
+          />
+        </button>
 
-      <div class="tool-menu__line" />
+        <button
+          class="tool-menu__item"
+          title="Load Sample"
+          onClick={handleLoadSampleClick}
+        >
+          <img
+            src="auto_stories_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
+            class="tool-menu__img"
+          />
+        </button>
 
-      <button
-        class="tool-menu__item"
-        title="Delete"
-        onClick={() => model.removeSelected()}
-      >
-        <img
-          src="delete_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
-          class="tool-menu__img"
+        <div class="tool-menu__line" />
+
+        <input
+          type="radio"
+          name="network"
+          id="toolbar-online"
+          class="tool-menu__radio"
+          value="online"
+          checked={online()}
+          onChange={handleOnlineClick}
         />
-      </button>
+        <div class="tool-menu__item">
+          <label title="Offline" for="toolbar-online" class="tool-menu__label">
+            <img
+              src="wifi_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
+              class="tool-menu__img"
+            />
+          </label>
+        </div>
 
-      <div class="tool-menu__line" />
-
-      <button class="tool-menu__item" title="Undo">
-        <img
-          src="undo_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
-          class="tool-menu__img"
+        <input
+          type="radio"
+          name="network"
+          id="toolbar-offline"
+          class="tool-menu__radio"
+          value="offline"
+          checked={!online()}
+          onChange={handleOfflineClick}
         />
-      </button>
-
-      <button class="tool-menu__item" title="Redo">
-        <img
-          src="redo_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
-          class="tool-menu__img"
-        />
-      </button>
+        <div class="tool-menu__item">
+          <label title="Online" for="toolbar-offline" class="tool-menu__label">
+            <img
+              src="wifi_off_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
+              class="tool-menu__img"
+            />
+          </label>
+        </div>
+      </div>
     </div>
   );
 }

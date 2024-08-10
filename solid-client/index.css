@@ -17,10 +17,6 @@
   background-color: var(--primary3-color);
 }
 
-body {
-  font-size: 12px;
-}
-
 button,
 select,
 input,

@@ -1,14 +1,26 @@
 import { batch, createSignal } from "solid-js";
-import { createStore } from "solid-js/store";
 
-import { createDefaultGraph, createEdge, createNode } from "./data-factory";
-import { EdgeId, Graph, GraphNode, NodeId, Point } from "./data-type";
+import { SetStoreFunction } from "solid-js/store";
+import { createEdge, createNode } from "./data-factory";
+import {
+  EdgeId,
+  Graph,
+  GraphNode,
+  NODE_HEIGHT,
+  NODE_WIDTH,
+  NodeId,
+  Point,
+} from "./data-type";
+import { YjsAction } from "./yjs-reducer";
 
 export type ToolbarMode = "pointer" | "addNode" | "addEdge";
-export type DragMode = "none" | "drag";
+export type DragMode = "none" | "dragStart" | "dragMove";
 
-export function makeDataModel() {
-  const [graphStore, setGraphStore] = createStore<Graph>(createDefaultGraph());
+export function makeDataModel(
+  graphStore: Graph,
+  dispatch: (action: YjsAction) => void,
+  setGraphStore: SetStoreFunction<Graph>
+) {
   const [toolbarMode, setToolbarMode] = createSignal<ToolbarMode>("pointer");
   const [dragMode, setDragMode] = createSignal<DragMode>("none");
   const [addingEdgeLine, setAddingEdgeLine] = createSignal<{
@@ -40,12 +52,17 @@ export function makeDataModel() {
     });
   }
 
+  function updateNodeText(node: GraphNode, text: string) {
+    dispatch({ type: "updateNode", node: { ...node, text } });
+  }
+
   function dragStart(nodeId: NodeId) {
     selectNode(nodeId);
-    setDragMode("drag");
+    setDragMode("dragStart");
   }
 
   function dragMove(movementX: number, movementY: number) {
+    setDragMode("dragMove");
     setGraphStore(
       "nodeList",
       (node) => node.selected,
@@ -58,19 +75,25 @@ export function makeDataModel() {
   }
 
   function dragEnd() {
+    if (dragMode() === "dragMove") {
+      const node = graphStore.nodeList.find((node) => node.selected);
+      if (node) {
+        dispatch({ type: "updateNode", node });
+      }
+    }
     setDragMode("none");
   }
 
   function addNode(x: number, y: number) {
-    const node = createNode(x, y, true);
-    setGraphStore("nodeList", graphStore.nodeList.length, node);
+    const node = createNode(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2);
+    dispatch({ type: "addNode", node });
   }
 
   function addEdgeStart(node: GraphNode) {
     clearSelect();
     const point = {
-      x: node.x + node.width / 2,
-      y: node.y + node.height / 2,
+      x: node.x + NODE_WIDTH / 2,
+      y: node.y + NODE_HEIGHT / 2,
     };
     setAddingEdgeLine({
       startNodeId: node.id,
@@ -96,45 +119,38 @@ export function makeDataModel() {
             (it.startNodeId !== node.id || it.endNodeId !== line.startNodeId)
         )
       ) {
-        const edge = createEdge(line.startNodeId, node.id, true);
-        setGraphStore("edgeList", graphStore.edgeList.length, edge);
+        const edge = createEdge(line.startNodeId, node.id);
+        dispatch({ type: "addEdge", edge });
       }
     }
     setAddingEdgeLine(null);
   }
 
   function removeSelected() {
-    batch(() => {
-      graphStore.nodeList
-        .filter((node) => node.selected)
-        .forEach((node) =>
-          setGraphStore(
-            "edgeList",
-            (edge) =>
-              edge.startNodeId === node.id || edge.endNodeId === node.id,
-            "selected",
-            true
-          )
-        );
-      setGraphStore(
-        "edgeList",
-        graphStore.edgeList.filter((edge) => !edge.selected)
-      );
-      setGraphStore(
-        "nodeList",
-        graphStore.nodeList.filter((node) => !node.selected)
-      );
-    });
+    const nodeIndex = graphStore.nodeList.findIndex((node) => node.selected);
+    const nodeId = 0 <= nodeIndex ? graphStore.nodeList[nodeIndex].id : null;
+    const edgeIndexList = graphStore.edgeList
+      .map((node, idx) =>
+        node.selected ||
+        node.startNodeId === nodeId ||
+        node.endNodeId === nodeId
+          ? idx
+          : -1
+      )
+      .filter((idx) => 0 <= idx);
+    dispatch({ type: "remove", nodeIndex, edgeIndexes: edgeIndexList });
   }
 
   return {
     graphStore,
+    setGraphStore,
     toolbarMode,
     setToolbarMode,
     dragMode,
     selectNode,
     selectEdge,
     clearSelect,
+    updateNodeText,
     dragStart,
     dragMove,
     dragEnd,
@@ -143,6 +159,7 @@ export function makeDataModel() {
     addEdgeStart,
     addEdgeMove,
     addEdgeEnd,
+    setAddingEdgeLine,
     removeSelected,
   };
 }

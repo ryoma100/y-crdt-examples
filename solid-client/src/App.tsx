@@ -6,11 +6,11 @@ import { useGraphContext } from "./context";
 export type MouseMode = "pointer" | "addNode" | "addEdge";
 
 function App() {
-  const model = useGraphContext();
+  const { dataModel } = useGraphContext();
 
   function handleKeyDown(e: KeyboardEvent) {
     if (e.key === "Escape") {
-      model.setToolbarMode("pointer");
+      dataModel.setToolbarMode("pointer");
     }
   }
 

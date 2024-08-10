@@ -1,12 +1,12 @@
 import { JSXElement, createSignal } from "solid-js";
 
 import { useGraphContext } from "../context";
-import { GraphNode } from "../data-model/data-type";
+import { GraphNode, NODE_HEIGHT, NODE_WIDTH } from "../data-model/data-type";
 
 import "./node.css";
 
 export function Node(props: { node: GraphNode }): JSXElement {
-  const model = useGraphContext();
+  const { dataModel } = useGraphContext();
 
   const [readonly, setReadonly] = createSignal(true);
 
@@ -16,9 +16,14 @@ export function Node(props: { node: GraphNode }): JSXElement {
   }
 
   function handleFocusOut() {
+    if (textareaRef == null) return;
+
+    if (props.node.text !== textareaRef.value) {
+      dataModel.updateNodeText(props.node, textareaRef.value);
+    }
     setTimeout(() => {
       // Wait a moment to deselect textarea.
-      textareaRef?.setSelectionRange(0, 0);
+      textareaRef.setSelectionRange(0, 0);
       setReadonly(true);
     }, 0);
   }
@@ -34,20 +39,20 @@ export function Node(props: { node: GraphNode }): JSXElement {
     e.stopPropagation();
     if (!readonly()) return;
 
-    switch (model.toolbarMode()) {
+    switch (dataModel.toolbarMode()) {
       case "pointer":
       case "addNode":
-        model.dragStart(props.node.id);
+        dataModel.dragStart(props.node.id);
         break;
       case "addEdge":
-        model.addEdgeStart(props.node);
+        dataModel.addEdgeStart(props.node);
         break;
     }
   }
 
   function handleMouseUp() {
-    if (model.toolbarMode() === "addEdge") {
-      model.addEdgeEnd(props.node);
+    if (dataModel.toolbarMode() === "addEdge") {
+      dataModel.addEdgeEnd(props.node);
     }
   }
 
@@ -56,8 +61,8 @@ export function Node(props: { node: GraphNode }): JSXElement {
     <foreignObject
       x={props.node.x}
       y={props.node.y}
-      width={props.node.width}
-      height={props.node.height}
+      width={NODE_WIDTH}
+      height={NODE_HEIGHT}
     >
       <div
         class="node"
@@ -74,8 +79,8 @@ export function Node(props: { node: GraphNode }): JSXElement {
             "node__textarea--editable": !readonly(),
           }}
           style={{
-            width: `${props.node.width - 6}px`,
-            height: `${props.node.height - 6}px`,
+            width: `${NODE_WIDTH - 6}px`,
+            height: `${NODE_HEIGHT - 6}px`,
           }}
           value={props.node.text}
           readOnly={readonly()}

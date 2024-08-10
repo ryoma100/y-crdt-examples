@@ -7,32 +7,32 @@ import { Node } from "./node";
 import "./diagram.css";
 
 export function Diagram(): JSXElement {
-  const model = useGraphContext();
+  const { dataModel } = useGraphContext();
 
   function handleMouseDown(e: MouseEvent) {
-    model.clearSelect();
-    if (model.toolbarMode() === "addNode") {
-      model.addNode(e.clientX, e.clientY);
+    dataModel.clearSelect();
+    if (dataModel.toolbarMode() === "addNode") {
+      dataModel.addNode(e.clientX, e.clientY);
     }
   }
 
   function handleMouseMove(e: MouseEvent) {
-    if (model.dragMode() === "drag") {
-      model.dragMove(e.movementX, e.movementY);
+    if (dataModel.dragMode() !== "none") {
+      dataModel.dragMove(e.movementX, e.movementY);
     }
-    if (model.addingEdgeLine() != null) {
-      model.addEdgeMove(e.clientX, e.clientY);
+    if (dataModel.addingEdgeLine() != null) {
+      dataModel.addEdgeMove(e.clientX, e.clientY);
     }
   }
 
   function handleMouseUp() {
-    switch (model.toolbarMode()) {
+    switch (dataModel.toolbarMode()) {
       case "pointer":
       case "addNode":
-        model.dragEnd();
+        dataModel.dragEnd();
         break;
       case "addEdge":
-        model.addEdgeEnd();
+        dataModel.addEdgeEnd();
         break;
     }
   }
@@ -45,19 +45,23 @@ export function Diagram(): JSXElement {
       onMouseUp={handleMouseUp}
     >
       <g data-id="edges">
-        <For each={model.graphStore.edgeList}>{(edge) => Edge({ edge })}</For>
+        <For each={dataModel.graphStore.edgeList}>
+          {(edge) => Edge({ edge })}
+        </For>
       </g>
       <g data-id="nodes">
-        <For each={model.graphStore.nodeList}>{(node) => Node({ node })}</For>
+        <For each={dataModel.graphStore.nodeList}>
+          {(node) => Node({ node })}
+        </For>
       </g>
       <g data-id="addingLine">
-        <Show when={model.addingEdgeLine() != null}>
+        <Show when={dataModel.addingEdgeLine() != null}>
           <line
             class="adding-line"
-            x1={model.addingEdgeLine()?.startPoint.x}
-            y1={model.addingEdgeLine()?.startPoint.y}
-            x2={model.addingEdgeLine()?.endPoint.x}
-            y2={model.addingEdgeLine()?.endPoint.y}
+            x1={dataModel.addingEdgeLine()?.startPoint.x}
+            y1={dataModel.addingEdgeLine()?.startPoint.y}
+            x2={dataModel.addingEdgeLine()?.endPoint.x}
+            y2={dataModel.addingEdgeLine()?.endPoint.y}
           />
         </Show>
       </g>

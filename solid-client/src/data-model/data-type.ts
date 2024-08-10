@@ -5,13 +5,6 @@ export type Point = {
 
 export type Line = { start: Point; end: Point };
 
-export type Size = {
-  width: number;
-  height: number;
-};
-
-export type Rectangle = Point & Size;
-
 export type NodeId = string;
 export type EdgeId = string;
 
@@ -19,7 +12,10 @@ export type GraphNode = {
   id: NodeId;
   text: string;
   selected: boolean;
-} & Rectangle;
+} & Point;
+
+export const NODE_WIDTH = 120;
+export const NODE_HEIGHT = 60;
 
 export type GraphEdge = {
   id: EdgeId;
