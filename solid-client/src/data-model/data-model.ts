@@ -111,7 +111,7 @@ export function makeDataModel(
 
   function addEdgeEnd(node: GraphNode | null = null) {
     const line = addingEdgeLine();
-    if (line != null && node != null && line.startNodeId != node.id) {
+    if (line != null && node != null && line.startNodeId !== node.id) {
       if (
         graphStore.edgeList.every(
           (it) =>

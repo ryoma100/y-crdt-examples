@@ -32,13 +32,13 @@ export function bindYjsToStore<T>(
 
             let retain = 0;
             event.changes.delta.forEach((item) => {
-              if (item.retain) {
+              if (item.retain != null) {
                 retain += item.retain;
               }
-              if (item.delete) {
+              if (item.delete != null) {
                 parent.s.splice(retain, item.delete);
               }
-              if (item.insert) {
+              if (item.insert != null) {
                 if (Array.isArray(item.insert)) {
                   item.insert.forEach((yv, i) => {
                     insertYValueToS(yv, parent.s, retain + i);

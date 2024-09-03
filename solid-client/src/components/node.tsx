@@ -37,6 +37,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
 
   function handleMouseDown(e: MouseEvent) {
     e.stopPropagation();
+    e.preventDefault();
     if (!readonly()) return;
 
     switch (dataModel.toolbarMode()) {
