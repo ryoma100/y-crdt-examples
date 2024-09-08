@@ -7,7 +7,8 @@ import "./tool-menu.css";
 export function ToolMenu() {
   const {
     dataModel,
-    yjsReducer: { provider, dispatch },
+    yjsProvider: { provider },
+    yjsDispatch,
   } = useGraphContext();
   const [online, setOnline] = createSignal(true);
 
@@ -23,7 +24,7 @@ export function ToolMenu() {
 
   function handleLoadSampleClick() {
     const { nodeList, edgeList } = createSampleGraph();
-    dispatch({ type: "load", nodeList, edgeList });
+    yjsDispatch({ type: "load", nodeList, edgeList });
   }
 
   return (
@@ -101,7 +102,7 @@ export function ToolMenu() {
         <button
           class="tool-menu__item"
           title="Undo"
-          onClick={() => dispatch({ type: "undo" })}
+          onClick={() => yjsDispatch({ type: "undo" })}
         >
           <img
             src="undo_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
@@ -112,7 +113,7 @@ export function ToolMenu() {
         <button
           class="tool-menu__item"
           title="Redo"
-          onClick={() => dispatch({ type: "redo" })}
+          onClick={() => yjsDispatch({ type: "redo" })}
         >
           <img
             src="redo_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"
@@ -124,7 +125,7 @@ export function ToolMenu() {
         <button
           class="tool-menu__item"
           title="Initialize"
-          onClick={() => dispatch({ type: "init" })}
+          onClick={() => yjsDispatch({ type: "init" })}
         >
           <img
             src="new_window_24dp_5F6368_FILL0_wght400_GRAD0_opsz24.svg"

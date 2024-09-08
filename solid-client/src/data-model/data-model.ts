@@ -1,6 +1,8 @@
 import { batch, createSignal } from "solid-js";
 
 import { SetStoreFunction } from "solid-js/store";
+import { AwarenessAction } from "../data-reducer/awareness-reducer";
+import { YjsAction } from "../data-reducer/yjs-reducer";
 import { createEdge, createNode } from "./data-factory";
 import {
   EdgeId,
@@ -11,14 +13,14 @@ import {
   NodeId,
   Point,
 } from "./data-type";
-import { YjsAction } from "./yjs-reducer";
 
 export type ToolbarMode = "pointer" | "addNode" | "addEdge";
 export type DragMode = "none" | "dragStart" | "dragMove";
 
 export function makeDataModel(
   graphStore: Graph,
-  dispatch: (action: YjsAction) => void,
+  yjsDispatch: (action: YjsAction) => void,
+  awarenessDispatch: (action: AwarenessAction) => void,
   setGraphStore: SetStoreFunction<Graph>
 ) {
   const [toolbarMode, setToolbarMode] = createSignal<ToolbarMode>("pointer");
@@ -53,7 +55,7 @@ export function makeDataModel(
   }
 
   function updateNodeText(node: GraphNode, text: string) {
-    dispatch({ type: "updateNode", node: { ...node, text } });
+    yjsDispatch({ type: "updateNode", node: { ...node, text } });
   }
 
   function dragStart(nodeId: NodeId) {
@@ -72,13 +74,27 @@ export function makeDataModel(
         y: node.y + movementY,
       })
     );
+
+    const node = graphStore.nodeList.find((it) => it.selected);
+    if (node) {
+      awarenessDispatch({
+        type: "moveNode",
+        nodeId: node.id,
+        x: node.x,
+        y: node.y,
+      });
+    }
   }
 
   function dragEnd() {
     if (dragMode() === "dragMove") {
       const node = graphStore.nodeList.find((node) => node.selected);
       if (node) {
-        dispatch({ type: "updateNode", node });
+        awarenessDispatch({
+          type: "clear",
+          nodeId: node.id,
+        });
+        yjsDispatch({ type: "updateNode", node });
       }
     }
     setDragMode("none");
@@ -86,7 +102,13 @@ export function makeDataModel(
 
   function addNode(x: number, y: number) {
     const node = createNode(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2);
-    dispatch({ type: "addNode", node });
+    yjsDispatch({ type: "addNode", node });
+    awarenessDispatch({
+      type: "moveNode",
+      nodeId: node.id,
+      x: node.x,
+      y: node.y,
+    });
   }
 
   function addEdgeStart(node: GraphNode) {
@@ -120,7 +142,7 @@ export function makeDataModel(
         )
       ) {
         const edge = createEdge(line.startNodeId, node.id);
-        dispatch({ type: "addEdge", edge });
+        yjsDispatch({ type: "addEdge", edge });
       }
     }
     setAddingEdgeLine(null);
@@ -138,7 +160,7 @@ export function makeDataModel(
           : -1
       )
       .filter((idx) => 0 <= idx);
-    dispatch({ type: "remove", nodeIndex, edgeIndexes: edgeIndexList });
+    yjsDispatch({ type: "remove", nodeIndex, edgeIndexes: edgeIndexList });
   }
 
   return {

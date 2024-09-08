@@ -1,9 +1,7 @@
-import { SetStoreFunction } from "solid-js/store";
-import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
-import { bindYjsToStore, convertYMap } from "../yjs-solidjs/yjs-solidjs";
-import { Graph, GraphEdge, GraphNode } from "./data-type";
+import { GraphEdge, GraphNode } from "../data-model/data-type";
+import { convertYMap } from "../yjs-solidjs/yjs-solidjs";
 
 export type YjsAction =
   | { type: "addNode"; node: GraphNode }
@@ -15,19 +13,8 @@ export type YjsAction =
   | { type: "init" }
   | { type: "load"; nodeList: GraphNode[]; edgeList: GraphEdge[] };
 
-export function createYjsReducer(setStore: SetStoreFunction<Graph>) {
-  const yDoc = new Y.Doc();
-  const provider = new WebsocketProvider(
-    "ws://localhost:1234",
-    "graph-example.room-1",
-    yDoc
-  );
-
-  const yRoot = yDoc.getMap("graph-example.v1");
-  yRoot.set("nodeList", new Y.Array<Y.Map<GraphNode>>());
-  yRoot.set("edgeList", new Y.Array<Y.Map<GraphEdge>>());
+export function makeYjsReducer(yRoot: Y.Map<unknown>) {
   const undoManager = new Y.UndoManager(yRoot);
-  bindYjsToStore(yRoot, setStore);
 
   const nodeList = () => yRoot.get("nodeList") as Y.Array<Y.Map<GraphNode>>;
   const edgeList = () => yRoot.get("edgeList") as Y.Array<Y.Map<GraphEdge>>;
@@ -62,7 +49,7 @@ export function createYjsReducer(setStore: SetStoreFunction<Graph>) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     nodeList().forEach((yNode: Y.Map<any>) => {
       if (yNode.get("id") === node.id) {
-        yDoc.transact(() => {
+        yRoot.doc?.transact(() => {
           const { selected: _, ...shareNode } = node;
           convertYMap(shareNode, yNode);
         });
@@ -113,6 +100,5 @@ export function createYjsReducer(setStore: SetStoreFunction<Graph>) {
 
   return {
     dispatch,
-    provider,
   };
 }

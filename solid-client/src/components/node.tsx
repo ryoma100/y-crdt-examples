@@ -6,18 +6,24 @@ import { GraphNode, NODE_HEIGHT, NODE_WIDTH } from "../data-model/data-type";
 import "./node.css";
 
 export function Node(props: { node: GraphNode }): JSXElement {
-  const { dataModel } = useGraphContext();
+  const { dataModel, awarenessDispatch } = useGraphContext();
 
   const [readonly, setReadonly] = createSignal(true);
 
   function handleDblClick() {
     setReadonly(false);
     textareaRef?.select();
+    awarenessDispatch({
+      type: "inputNode",
+      nodeId: props.node.id,
+      text: props.node.text,
+    });
   }
 
   function handleFocusOut() {
     if (textareaRef == null) return;
 
+    awarenessDispatch({ type: "clear", nodeId: props.node.id });
     if (props.node.text !== textareaRef.value) {
       dataModel.updateNodeText(props.node, textareaRef.value);
     }
@@ -57,6 +63,16 @@ export function Node(props: { node: GraphNode }): JSXElement {
     }
   }
 
+  function handleInput(_e: InputEvent) {
+    if (textareaRef == null) return;
+
+    awarenessDispatch({
+      type: "inputNode",
+      nodeId: props.node.id,
+      text: textareaRef.value,
+    });
+  }
+
   let textareaRef: HTMLTextAreaElement | undefined;
   return (
     <foreignObject
@@ -88,6 +104,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
           readOnly={readonly()}
           onKeyDown={handleKeyDown}
           onFocusOut={handleFocusOut}
+          onInput={handleInput}
         />
         <div />
       </div>

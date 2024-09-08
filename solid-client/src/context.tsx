@@ -4,12 +4,30 @@ import { createStore } from "solid-js/store";
 import { createDefaultGraph } from "./data-model/data-factory";
 import { makeDataModel } from "./data-model/data-model";
 import { Graph } from "./data-model/data-type";
-import { createYjsReducer } from "./data-model/yjs-reducer";
+import { makeAwarenessReducer } from "./data-reducer/awareness-reducer";
+import { makeYjsProvider } from "./data-reducer/yjs-provider";
+import { makeYjsReducer } from "./data-reducer/yjs-reducer";
 
 const [graphStore, setGraphStore] = createStore<Graph>(createDefaultGraph());
-const yjsReducer = createYjsReducer(setGraphStore);
-const dataModel = makeDataModel(graphStore, yjsReducer.dispatch, setGraphStore);
-const contextValue = { dataModel, yjsReducer };
+
+const yjsProvider = makeYjsProvider(setGraphStore);
+const yjsReducer = makeYjsReducer(yjsProvider.yRoot);
+const awarenessReducer = makeAwarenessReducer(
+  yjsProvider.provider,
+  setGraphStore
+);
+const dataModel = makeDataModel(
+  graphStore,
+  yjsReducer.dispatch,
+  awarenessReducer.dispatch,
+  setGraphStore
+);
+const contextValue = {
+  dataModel,
+  yjsProvider,
+  yjsDispatch: yjsReducer.dispatch,
+  awarenessDispatch: awarenessReducer.dispatch,
+};
 
 export const GraphContext = createContext(contextValue);
 
