@@ -1,4 +1,4 @@
-import { JSXElement, createSignal } from "solid-js";
+import { JSXElement, Show, createSignal } from "solid-js";
 
 import { useGraphContext } from "../context";
 import { GraphNode, NODE_HEIGHT, NODE_WIDTH } from "../data-model/data-type";
@@ -23,7 +23,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
   function handleFocusOut() {
     if (textareaRef == null) return;
 
-    awarenessDispatch({ type: "clear", nodeId: props.node.id });
+    awarenessDispatch({ type: "none" });
     if (props.node.text !== textareaRef.value) {
       dataModel.updateNodeText(props.node, textareaRef.value);
     }
@@ -75,39 +75,55 @@ export function Node(props: { node: GraphNode }): JSXElement {
 
   let textareaRef: HTMLTextAreaElement | undefined;
   return (
-    <foreignObject
-      x={props.node.x}
-      y={props.node.y}
-      width={NODE_WIDTH}
-      height={NODE_HEIGHT}
-    >
-      <div
-        class="node"
-        classList={{ "node--selected": props.node.selected }}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onDblClick={handleDblClick}
+    <>
+      <Show when={props.node.lockTitle != null}>
+        <foreignObject
+          x={props.node.x}
+          y={props.node.y - 24}
+          width={NODE_WIDTH}
+          height={24}
+        >
+          <div class="node__lock-title">{props.node.lockTitle}</div>
+        </foreignObject>
+      </Show>
+      <foreignObject
+        x={props.node.x}
+        y={props.node.y}
+        width={NODE_WIDTH}
+        height={NODE_HEIGHT}
       >
-        <textarea
-          ref={textareaRef}
-          name="textarea"
-          class="node__textarea"
+        <div
+          class="node"
           classList={{
-            "node__textarea--readonly": readonly(),
-            "node__textarea--editable": !readonly(),
+            "node--selected": props.node.selected,
+            "node--lock": props.node.lockTitle != null,
           }}
-          style={{
-            width: `${NODE_WIDTH - 6}px`,
-            height: `${NODE_HEIGHT - 6}px`,
-          }}
-          value={props.node.text}
-          readOnly={readonly()}
-          onKeyDown={handleKeyDown}
-          onFocusOut={handleFocusOut}
-          onInput={handleInput}
-        />
-        <div />
-      </div>
-    </foreignObject>
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onDblClick={handleDblClick}
+        >
+          <textarea
+            ref={textareaRef}
+            name="textarea"
+            class="node__textarea"
+            classList={{
+              "node__textarea--readonly": readonly(),
+              "node__textarea--editable": !readonly(),
+              "node__textarea--lock": props.node.lockTitle != null,
+            }}
+            style={{
+              width: `${NODE_WIDTH - 6}px`,
+              height: `${NODE_HEIGHT - 6}px`,
+            }}
+            value={props.node.text}
+            readOnly={readonly()}
+            onKeyDown={handleKeyDown}
+            onFocusOut={handleFocusOut}
+            onInput={handleInput}
+          />
+          <div />
+        </div>
+      </foreignObject>
+    </>
   );
 }

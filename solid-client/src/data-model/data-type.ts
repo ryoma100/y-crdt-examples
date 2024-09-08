@@ -12,6 +12,7 @@ export type GraphNode = {
   id: NodeId;
   text: string;
   selected: boolean;
+  lockTitle?: string;
 } & Point;
 
 export const NODE_WIDTH = 120;

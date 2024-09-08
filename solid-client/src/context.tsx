@@ -24,9 +24,15 @@ const dataModel = makeDataModel(
 );
 const contextValue = {
   dataModel,
-  yjsProvider,
   yjsDispatch: yjsReducer.dispatch,
   awarenessDispatch: awarenessReducer.dispatch,
+  connect: () => {
+    yjsProvider.provider.connect();
+  },
+  disconnect: () => {
+    awarenessReducer.clear();
+    yjsProvider.provider.disconnect();
+  },
 };
 
 export const GraphContext = createContext(contextValue);

@@ -10,6 +10,10 @@
   border: solid 2px var(--selected-color);
 }
 
+.node--lock {
+  background-color: gray;
+}
+
 .node__textarea {
   margin: 1px;
   padding: 4px;
@@ -26,4 +30,22 @@
 
 .node__textarea--editable {
   user-select: text;
+}
+
+.node__textarea--lock {
+  user-select: none;
+  cursor: not-allowed;
+  outline: none;
+  background-color: lightgray;
+}
+
+.node__lock-title {
+  font-size: 12px;
+  background-color: lightgray;
+  padding: 4px;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  height: 24px;
+  width: 120px;
 }

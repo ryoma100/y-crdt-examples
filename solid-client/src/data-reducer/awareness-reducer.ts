@@ -3,7 +3,7 @@ import { WebsocketProvider } from "y-websocket";
 import { Graph, NodeId } from "../data-model/data-type";
 
 export type AwarenessAction =
-  | { type: "clear"; nodeId: NodeId }
+  | { type: "none" }
   | {
       type: "inputNode";
       nodeId: NodeId;
@@ -14,6 +14,10 @@ export type AwarenessAction =
       nodeId: NodeId;
       x: number;
       y: number;
+    }
+  | {
+      type: "addEdge";
+      nodeId: NodeId;
     };
 
 type AwarenessState = {
@@ -34,6 +38,10 @@ export function makeAwarenessReducer(
     awareness.setLocalState(state);
   }
 
+  function clear(): void {
+    awareness.setLocalState(null);
+  }
+
   function handleAwarenessChange(_changes: unknown) {
     const states = Object.fromEntries(awareness.getStates()) as AwarenessStates;
     // console.log("receive awareness", states);
@@ -41,22 +49,37 @@ export function makeAwarenessReducer(
     Object.entries(states).forEach(([clientID, state]) => {
       if (state != null && clientID !== String(awareness.clientID)) {
         switch (state.type) {
+          case "none":
+            unlockNode();
+            break;
           case "inputNode":
             updateInputNode(state.userName, state.nodeId, state.text);
             break;
           case "moveNode":
             updateMoveNode(state.userName, state.nodeId, state.x, state.y);
             break;
+          case "addEdge":
+            updateAddEdgeNode(state.userName, state.nodeId);
+            break;
         }
       }
     });
   }
 
-  function updateInputNode(_userName: string, nodeId: NodeId, text: string) {
+  function unlockNode() {
+    setStore(
+      "nodeList",
+      (node) => node.lockTitle != null,
+      (node) => ({ ...node, lockTitle: undefined })
+    );
+  }
+
+  function updateInputNode(userName: string, nodeId: NodeId, text: string) {
     setStore(
       produce((graph) => {
         const node = graph.nodeList.find((it) => it.id === nodeId);
         if (node != null) {
+          node.lockTitle = `${userName} inputting`;
           node.text = text;
         }
       })
@@ -64,7 +87,7 @@ export function makeAwarenessReducer(
   }
 
   function updateMoveNode(
-    _userName: string,
+    userName: string,
     nodeId: NodeId,
     x: number,
     y: number
@@ -73,6 +96,7 @@ export function makeAwarenessReducer(
       produce((graph) => {
         const node = graph.nodeList.find((it) => it.id === nodeId);
         if (node != null) {
+          node.lockTitle = `${userName} moving`;
           node.x = x;
           node.y = y;
         }
@@ -80,5 +104,16 @@ export function makeAwarenessReducer(
     );
   }
 
-  return { dispatch };
+  function updateAddEdgeNode(userName: string, nodeId: NodeId) {
+    setStore(
+      produce((graph) => {
+        const node = graph.nodeList.find((it) => it.id === nodeId);
+        if (node != null) {
+          node.lockTitle = `${userName} adding edge`;
+        }
+      })
+    );
+  }
+
+  return { dispatch, clear };
 }

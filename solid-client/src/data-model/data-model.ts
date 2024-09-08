@@ -90,10 +90,7 @@ export function makeDataModel(
     if (dragMode() === "dragMove") {
       const node = graphStore.nodeList.find((node) => node.selected);
       if (node) {
-        awarenessDispatch({
-          type: "clear",
-          nodeId: node.id,
-        });
+        awarenessDispatch({ type: "none" });
         yjsDispatch({ type: "updateNode", node });
       }
     }
@@ -103,12 +100,6 @@ export function makeDataModel(
   function addNode(x: number, y: number) {
     const node = createNode(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2);
     yjsDispatch({ type: "addNode", node });
-    awarenessDispatch({
-      type: "moveNode",
-      nodeId: node.id,
-      x: node.x,
-      y: node.y,
-    });
   }
 
   function addEdgeStart(node: GraphNode) {
@@ -122,6 +113,7 @@ export function makeDataModel(
       startPoint: point,
       endPoint: point,
     });
+    awarenessDispatch({ type: "addEdge", nodeId: node.id });
   }
 
   function addEdgeMove(x: number, y: number) {
@@ -146,6 +138,7 @@ export function makeDataModel(
       }
     }
     setAddingEdgeLine(null);
+    awarenessDispatch({ type: "none" });
   }
 
   function removeSelected() {

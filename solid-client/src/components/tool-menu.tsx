@@ -5,21 +5,17 @@ import { createSampleGraph } from "../data-model/data-factory";
 import "./tool-menu.css";
 
 export function ToolMenu() {
-  const {
-    dataModel,
-    yjsProvider: { provider },
-    yjsDispatch,
-  } = useGraphContext();
+  const { dataModel, connect, disconnect, yjsDispatch } = useGraphContext();
   const [online, setOnline] = createSignal(true);
 
   function handleOnlineClick() {
     setOnline(true);
-    provider.connect();
+    connect();
   }
 
   function handleOfflineClick() {
     setOnline(false);
-    provider.disconnect();
+    disconnect();
   }
 
   function handleLoadSampleClick() {
@@ -121,6 +117,7 @@ export function ToolMenu() {
           />
         </button>
       </div>
+
       <div class="tool-menu">
         <button
           class="tool-menu__item"
