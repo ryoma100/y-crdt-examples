@@ -32,11 +32,12 @@
   user-select: text;
 }
 
-.node__textarea--lock {
+.node__textarea:disabled {
   user-select: none;
   cursor: not-allowed;
   outline: none;
   background-color: lightgray;
+  opacity: 1;
 }
 
 .node__lock-title {

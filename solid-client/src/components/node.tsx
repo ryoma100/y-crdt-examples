@@ -109,7 +109,6 @@ export function Node(props: { node: GraphNode }): JSXElement {
             classList={{
               "node__textarea--readonly": readonly(),
               "node__textarea--editable": !readonly(),
-              "node__textarea--lock": props.node.lockTitle != null,
             }}
             style={{
               width: `${NODE_WIDTH - 6}px`,
@@ -117,6 +116,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
             }}
             value={props.node.text}
             readOnly={readonly()}
+            disabled={props.node.lockTitle != null}
             onKeyDown={handleKeyDown}
             onFocusOut={handleFocusOut}
             onInput={handleInput}
