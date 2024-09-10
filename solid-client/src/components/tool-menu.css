@@ -1,6 +1,9 @@
 .tool-menu__container {
   position: absolute;
   display: flex;
+  top: 8px;
+  left: 8px;
+  column-gap: 8px;
 }
 
 .tool-menu {
@@ -12,7 +15,6 @@
   padding-left: 2px;
   padding-right: 2px;
   background-color: white;
-  margin: 8px 0 0 8px;
 }
 
 .tool-menu__item {
@@ -59,4 +61,35 @@
   width: 1px;
   height: 40px;
   background-color: gray;
+}
+
+.user-menu__container {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.user-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: solid 1px gray;
+  border-radius: 9px;
+  padding-left: 2px;
+  padding-right: 2px;
+  background-color: white;
+}
+
+.user-menu__input {
+  font-size: 14px;
+  width: 128px;
+  height: 32px;
+  margin: 4px;
+}
+
+.user-menu__label {
+  font-size: 12px;
+  width: 128px;
+  height: 24px;
+  margin-left: 8px;
 }

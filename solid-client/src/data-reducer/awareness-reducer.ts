@@ -1,57 +1,50 @@
-import { produce, SetStoreFunction } from "solid-js/store";
+import { SetStoreFunction } from "solid-js/store";
 import { WebsocketProvider } from "y-websocket";
-import { Graph, NodeId } from "../data-model/data-type";
+import { GraphStore, NodeId, UserStore } from "../data-model/data-type";
 
 export type AwarenessAction =
   | { type: "none" }
-  | {
-      type: "inputNode";
-      nodeId: NodeId;
-      text: string;
-    }
-  | {
-      type: "moveNode";
-      nodeId: NodeId;
-      x: number;
-      y: number;
-    }
-  | {
-      type: "addEdge";
-      nodeId: NodeId;
-    };
+  | { type: "inputNode"; nodeId: NodeId; text: string }
+  | { type: "moveNode"; nodeId: NodeId; x: number; y: number }
+  | { type: "addEdge"; nodeId: NodeId }
+  | { type: "unlockNode"; nodeId: NodeId };
 
-type AwarenessState = {
+type AwarenessState = AwarenessAction & {
   userName: string;
-} & AwarenessAction;
-
+};
 type AwarenessStates = Record</* clientId */ string, AwarenessState>;
 
 export function makeAwarenessReducer(
   provider: WebsocketProvider,
-  setStore: SetStoreFunction<Graph>
+  userStore: UserStore,
+  setGraphStore: SetStoreFunction<GraphStore>,
+  setUserStore: SetStoreFunction<UserStore>
 ) {
   const awareness = provider.awareness;
   awareness.on("change", handleAwarenessChange);
 
-  function dispatch(action: AwarenessAction): void {
-    const state: AwarenessState = { userName: "user1", ...action };
-    awareness.setLocalState(state);
+  function login(): void {
+    awareness.setLocalState({ type: "none", userName: userStore.userName });
   }
 
-  function clear(): void {
+  function logout(): void {
     awareness.setLocalState(null);
+  }
+
+  function dispatch(action: AwarenessAction): void {
+    setUserStore("userName", userStore.userName);
+    awareness.setLocalState({ ...action, userName: userStore.userName });
   }
 
   function handleAwarenessChange(_changes: unknown) {
     const states = Object.fromEntries(awareness.getStates()) as AwarenessStates;
     // console.log("receive awareness", states);
 
+    const otherUserList: string[] = [];
     Object.entries(states).forEach(([clientID, state]) => {
-      if (state != null && clientID !== String(awareness.clientID)) {
+      if (clientID !== String(awareness.clientID)) {
+        otherUserList.push(state.userName);
         switch (state.type) {
-          case "none":
-            unlockNode();
-            break;
           case "inputNode":
             updateInputNode(state.userName, state.nodeId, state.text);
             break;
@@ -61,28 +54,20 @@ export function makeAwarenessReducer(
           case "addEdge":
             updateAddEdgeNode(state.userName, state.nodeId);
             break;
+          case "unlockNode":
+            unlockNode(state.nodeId);
+            break;
         }
       }
     });
-  }
-
-  function unlockNode() {
-    setStore(
-      "nodeList",
-      (node) => node.lockTitle != null,
-      (node) => ({ ...node, lockTitle: undefined })
-    );
+    setUserStore("otherUserList", otherUserList);
   }
 
   function updateInputNode(userName: string, nodeId: NodeId, text: string) {
-    setStore(
-      produce((graph) => {
-        const node = graph.nodeList.find((it) => it.id === nodeId);
-        if (node != null) {
-          node.lockTitle = `${userName} inputting`;
-          node.text = text;
-        }
-      })
+    setGraphStore(
+      "nodeList",
+      (node) => node.id === nodeId,
+      (node) => ({ ...node, lockTitle: `${userName} inputting`, text })
     );
   }
 
@@ -92,28 +77,28 @@ export function makeAwarenessReducer(
     x: number,
     y: number
   ) {
-    setStore(
-      produce((graph) => {
-        const node = graph.nodeList.find((it) => it.id === nodeId);
-        if (node != null) {
-          node.lockTitle = `${userName} moving`;
-          node.x = x;
-          node.y = y;
-        }
-      })
+    setGraphStore(
+      "nodeList",
+      (node) => node.id === nodeId,
+      (node) => ({ ...node, lockTitle: `${userName} moving`, x, y })
     );
   }
 
   function updateAddEdgeNode(userName: string, nodeId: NodeId) {
-    setStore(
-      produce((graph) => {
-        const node = graph.nodeList.find((it) => it.id === nodeId);
-        if (node != null) {
-          node.lockTitle = `${userName} adding edge`;
-        }
-      })
+    setGraphStore(
+      "nodeList",
+      (node) => node.id === nodeId,
+      (node) => ({ ...node, lockTitle: `${userName} adding edge` })
     );
   }
 
-  return { dispatch, clear };
+  function unlockNode(nodeId: NodeId) {
+    setGraphStore(
+      "nodeList",
+      (node) => node.id === nodeId,
+      (node) => ({ ...node, lockTitle: undefined })
+    );
+  }
+
+  return { dispatch, login, logout };
 }

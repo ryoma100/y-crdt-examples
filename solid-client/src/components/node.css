@@ -45,8 +45,5 @@
   background-color: lightgray;
   padding: 4px;
   white-space: nowrap;
-  overflow-x: hidden;
-  text-overflow: ellipsis;
   height: 24px;
-  width: 120px;
 }

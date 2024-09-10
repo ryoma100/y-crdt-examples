@@ -6,8 +6,8 @@ import { YjsAction } from "../data-reducer/yjs-reducer";
 import { createEdge, createNode } from "./data-factory";
 import {
   EdgeId,
-  Graph,
   GraphNode,
+  GraphStore,
   NODE_HEIGHT,
   NODE_WIDTH,
   NodeId,
@@ -18,10 +18,10 @@ export type ToolbarMode = "pointer" | "addNode" | "addEdge";
 export type DragMode = "none" | "dragStart" | "dragMove";
 
 export function makeDataModel(
-  graphStore: Graph,
+  graphStore: GraphStore,
   yjsDispatch: (action: YjsAction) => void,
   awarenessDispatch: (action: AwarenessAction) => void,
-  setGraphStore: SetStoreFunction<Graph>
+  setGraphStore: SetStoreFunction<GraphStore>
 ) {
   const [toolbarMode, setToolbarMode] = createSignal<ToolbarMode>("pointer");
   const [dragMode, setDragMode] = createSignal<DragMode>("none");
@@ -90,6 +90,7 @@ export function makeDataModel(
     if (dragMode() === "dragMove") {
       const node = graphStore.nodeList.find((node) => node.selected);
       if (node) {
+        awarenessDispatch({ type: "unlockNode", nodeId: node.id });
         awarenessDispatch({ type: "none" });
         yjsDispatch({ type: "updateNode", node });
       }
@@ -125,7 +126,9 @@ export function makeDataModel(
 
   function addEdgeEnd(node: GraphNode | null = null) {
     const line = addingEdgeLine();
-    if (line != null && node != null && line.startNodeId !== node.id) {
+    if (line == null) return;
+
+    if (node != null && line.startNodeId !== node.id) {
       if (
         graphStore.edgeList.every(
           (it) =>
@@ -137,8 +140,9 @@ export function makeDataModel(
         yjsDispatch({ type: "addEdge", edge });
       }
     }
-    setAddingEdgeLine(null);
+    awarenessDispatch({ type: "unlockNode", nodeId: line.startNodeId });
     awarenessDispatch({ type: "none" });
+    setAddingEdgeLine(null);
   }
 
   function removeSelected() {

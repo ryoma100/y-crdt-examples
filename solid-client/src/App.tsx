@@ -10,15 +10,15 @@ import "./App.css";
 export type MouseMode = "pointer" | "addNode" | "addEdge";
 
 function App() {
-  const { dataModel, disconnect } = useGraphContext();
+  const { dataModel, logout } = useGraphContext();
 
   if ("__TAURI_IPC__" in window) {
     appWindow.listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
-      disconnect();
+      logout();
     });
   } else {
     window.addEventListener("beforeunload", function (_e) {
-      disconnect();
+      logout();
     });
   }
 

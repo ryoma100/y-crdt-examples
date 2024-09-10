@@ -21,8 +21,9 @@ export function Node(props: { node: GraphNode }): JSXElement {
   }
 
   function handleFocusOut() {
-    if (textareaRef == null) return;
+    if (textareaRef == null || readonly()) return;
 
+    awarenessDispatch({ type: "unlockNode", nodeId: props.node.id });
     awarenessDispatch({ type: "none" });
     if (props.node.text !== textareaRef.value) {
       dataModel.updateNodeText(props.node, textareaRef.value);
@@ -80,10 +81,10 @@ export function Node(props: { node: GraphNode }): JSXElement {
         <foreignObject
           x={props.node.x}
           y={props.node.y - 24}
-          width={NODE_WIDTH}
+          width={NODE_WIDTH * 2}
           height={24}
         >
-          <div class="node__lock-title">{props.node.lockTitle}</div>
+          <span class="node__lock-title">{props.node.lockTitle}</span>
         </foreignObject>
       </Show>
       <foreignObject

@@ -25,7 +25,12 @@ export type GraphEdge = {
   selected: boolean;
 };
 
-export type Graph = {
+export type GraphStore = {
   nodeList: GraphNode[];
   edgeList: GraphEdge[];
+};
+
+export type UserStore = {
+  userName: string;
+  otherUserList: string[];
 };

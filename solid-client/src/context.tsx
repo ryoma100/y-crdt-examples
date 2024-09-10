@@ -1,21 +1,30 @@
 import { createContext, useContext } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { createStore } from "solid-js/store";
-import { createDefaultGraph } from "./data-model/data-factory";
+import {
+  createDefaultGraph,
+  createDefaultUser,
+} from "./data-model/data-factory";
 import { makeDataModel } from "./data-model/data-model";
-import { Graph } from "./data-model/data-type";
+import { GraphStore, UserStore } from "./data-model/data-type";
 import { makeAwarenessReducer } from "./data-reducer/awareness-reducer";
 import { makeYjsProvider } from "./data-reducer/yjs-provider";
 import { makeYjsReducer } from "./data-reducer/yjs-reducer";
 
-const [graphStore, setGraphStore] = createStore<Graph>(createDefaultGraph());
+const [graphStore, setGraphStore] = createStore<GraphStore>(
+  createDefaultGraph()
+);
+const [userStore, setUserStore] = createStore<UserStore>(createDefaultUser());
 
 const yjsProvider = makeYjsProvider(setGraphStore);
 const yjsReducer = makeYjsReducer(yjsProvider.yRoot);
 const awarenessReducer = makeAwarenessReducer(
   yjsProvider.provider,
-  setGraphStore
+  userStore,
+  setGraphStore,
+  setUserStore
 );
+awarenessReducer.login();
 const dataModel = makeDataModel(
   graphStore,
   yjsReducer.dispatch,
@@ -24,13 +33,18 @@ const dataModel = makeDataModel(
 );
 const contextValue = {
   dataModel,
+  userStore,
+  setUserStore,
   yjsDispatch: yjsReducer.dispatch,
   awarenessDispatch: awarenessReducer.dispatch,
   connect: () => {
     yjsProvider.provider.connect();
   },
   disconnect: () => {
-    awarenessReducer.clear();
+    yjsProvider.provider.disconnect();
+  },
+  logout: () => {
+    awarenessReducer.logout();
     yjsProvider.provider.disconnect();
   },
 };
