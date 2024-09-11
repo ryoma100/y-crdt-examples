@@ -62,20 +62,20 @@ export function makeAwarenessReducer(
           const state = otherStateMap[node.id];
           switch (state?.type) {
             case "inputNode":
-              node.lockTitle = `${state.userName} inputting`;
+              node._lockTitle = `${state.userName} inputting`;
               node.text = state.text;
               break;
             case "moveNode":
-              node.lockTitle = `${state.userName} moving`;
+              node._lockTitle = `${state.userName} moving`;
               node.x = state.x;
               node.y = state.y;
               break;
             case "addEdge":
-              node.lockTitle = `${state.userName} adding edge`;
+              node._lockTitle = `${state.userName} adding edge`;
               break;
             default:
-              if (node.lockTitle) {
-                node.lockTitle = undefined;
+              if (node._lockTitle) {
+                node._lockTitle = undefined;
               }
               break;
           }

@@ -11,8 +11,8 @@ export type EdgeId = string;
 export type GraphNode = {
   id: NodeId;
   text: string;
-  selected: boolean;
-  lockTitle?: string;
+  _selected?: boolean; // transient
+  _lockTitle?: string; // transient
 } & Point;
 
 export const NODE_WIDTH = 120;
@@ -22,7 +22,7 @@ export type GraphEdge = {
   id: EdgeId;
   startNodeId: NodeId;
   endNodeId: NodeId;
-  selected: boolean;
+  _selected?: boolean; // transient
 };
 
 export type GraphStore = {

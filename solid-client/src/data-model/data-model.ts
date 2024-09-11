@@ -33,24 +33,24 @@ export function makeDataModel(
 
   function selectNode(nodeId: NodeId) {
     batch(() => {
-      setGraphStore("nodeList", (node) => node.selected, "selected", false);
-      setGraphStore("nodeList", (node) => node.id === nodeId, "selected", true);
-      setGraphStore("edgeList", (edge) => edge.selected, "selected", false);
+      setGraphStore("nodeList", (it) => !!it._selected, "_selected", false);
+      setGraphStore("nodeList", (it) => it.id === nodeId, "_selected", true);
+      setGraphStore("edgeList", (it) => !!it._selected, "_selected", false);
     });
   }
 
   function selectEdge(edgeId: EdgeId) {
     batch(() => {
-      setGraphStore("nodeList", (node) => node.selected, "selected", false);
-      setGraphStore("edgeList", (edge) => edge.selected, "selected", false);
-      setGraphStore("edgeList", (edge) => edge.id === edgeId, "selected", true);
+      setGraphStore("nodeList", (it) => !!it._selected, "_selected", false);
+      setGraphStore("edgeList", (it) => !!it._selected, "_selected", false);
+      setGraphStore("edgeList", (it) => it.id === edgeId, "_selected", true);
     });
   }
 
   function clearSelect() {
     batch(() => {
-      setGraphStore("nodeList", (node) => node.selected, "selected", false);
-      setGraphStore("edgeList", (edge) => edge.selected, "selected", false);
+      setGraphStore("nodeList", (it) => !!it._selected, "_selected", false);
+      setGraphStore("edgeList", (it) => !!it._selected, "_selected", false);
     });
   }
 
@@ -67,7 +67,7 @@ export function makeDataModel(
     setDragMode("dragMove");
     setGraphStore(
       "nodeList",
-      (node) => node.selected,
+      (node) => !!node._selected,
       (node) => ({
         ...node,
         x: node.x + movementX,
@@ -75,7 +75,7 @@ export function makeDataModel(
       })
     );
 
-    const node = graphStore.nodeList.find((it) => it.selected);
+    const node = graphStore.nodeList.find((it) => it._selected);
     if (node) {
       awarenessDispatch({
         type: "moveNode",
@@ -88,7 +88,7 @@ export function makeDataModel(
 
   function dragEnd() {
     if (dragMode() === "dragMove") {
-      const node = graphStore.nodeList.find((node) => node.selected);
+      const node = graphStore.nodeList.find((node) => node._selected);
       if (node) {
         awarenessDispatch({ type: "none" });
         yjsDispatch({ type: "updateNode", node });
@@ -144,11 +144,11 @@ export function makeDataModel(
   }
 
   function removeSelected() {
-    const nodeIndex = graphStore.nodeList.findIndex((node) => node.selected);
+    const nodeIndex = graphStore.nodeList.findIndex((it) => it._selected);
     const nodeId = 0 <= nodeIndex ? graphStore.nodeList[nodeIndex].id : null;
     const edgeIndexList = graphStore.edgeList
       .map((node, idx) =>
-        node.selected ||
+        node._selected ||
         node.startNodeId === nodeId ||
         node.endNodeId === nodeId
           ? idx

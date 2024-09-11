@@ -50,8 +50,7 @@ export function makeYjsReducer(yRoot: Y.Map<unknown>) {
     nodeList().forEach((yNode: Y.Map<any>) => {
       if (yNode.get("id") === node.id) {
         yRoot.doc?.transact(() => {
-          const { selected: _1, lockTitle: _2, ...shareNode } = node;
-          convertYMap(shareNode, yNode);
+          convertYMap(node, yNode);
         });
       }
     });

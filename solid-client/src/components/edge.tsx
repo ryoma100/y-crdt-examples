@@ -23,8 +23,8 @@ export function Edge(props: { edge: GraphEdge }): JSXElement {
       <line
         class="edge"
         classList={{
-          "edge--unselected": !props.edge.selected,
-          "edge--selected": props.edge.selected,
+          "edge--unselected": !props.edge._selected,
+          "edge--selected": props.edge._selected,
         }}
         x1={fromNode().x + NODE_WIDTH / 2}
         y1={fromNode().y + NODE_HEIGHT / 2}

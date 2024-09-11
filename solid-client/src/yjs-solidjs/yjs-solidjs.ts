@@ -109,6 +109,8 @@ export function convertYMap<T extends Dict>(
   yMap: Y.Map<T> = new Y.Map<T>()
 ): Y.Map<T> {
   Object.entries(obj).forEach(([key, value]) => {
+    if (key.startsWith("_")) return; // transient field
+
     const yValue = toYjsValue(value);
     if (yValue !== undefined && yMap.get(key) !== yValue) {
       yMap.set(key, yValue);

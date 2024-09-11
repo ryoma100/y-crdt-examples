@@ -76,14 +76,14 @@ export function Node(props: { node: GraphNode }): JSXElement {
   let textareaRef: HTMLTextAreaElement | undefined;
   return (
     <>
-      <Show when={props.node.lockTitle != null}>
+      <Show when={props.node._lockTitle != null}>
         <foreignObject
           x={props.node.x}
           y={props.node.y - 24}
           width={NODE_WIDTH * 2}
           height={24}
         >
-          <span class="node__lock-title">{props.node.lockTitle}</span>
+          <span class="node__lock-title">{props.node._lockTitle}</span>
         </foreignObject>
       </Show>
       <foreignObject
@@ -95,8 +95,8 @@ export function Node(props: { node: GraphNode }): JSXElement {
         <div
           class="node"
           classList={{
-            "node--selected": props.node.selected,
-            "node--lock": props.node.lockTitle != null,
+            "node--selected": props.node._selected,
+            "node--lock": props.node._lockTitle != null,
           }}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
@@ -116,7 +116,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
             }}
             value={props.node.text}
             readOnly={readonly()}
-            disabled={props.node.lockTitle != null}
+            disabled={props.node._lockTitle != null}
             onKeyDown={handleKeyDown}
             onFocusOut={handleFocusOut}
             onInput={handleInput}

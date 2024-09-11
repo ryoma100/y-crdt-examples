@@ -7,30 +7,20 @@ import {
   UserStore,
 } from "./data-type";
 
-export function createNode(
-  x: number,
-  y: number,
-  selected: boolean = false
-): GraphNode {
+export function createNode(x: number, y: number): GraphNode {
   return {
     id: crypto.randomUUID(),
     x,
     y,
     text: "node",
-    selected,
   };
 }
 
-export function createEdge(
-  startNodeId: string,
-  endNodeId: string,
-  selected: boolean = false
-): GraphEdge {
+export function createEdge(startNodeId: string, endNodeId: string): GraphEdge {
   return {
     id: crypto.randomUUID(),
     startNodeId,
     endNodeId,
-    selected,
   };
 }
 
