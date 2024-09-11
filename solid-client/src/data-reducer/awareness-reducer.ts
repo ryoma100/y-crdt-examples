@@ -1,13 +1,13 @@
-import { SetStoreFunction } from "solid-js/store";
+import { produce, SetStoreFunction } from "solid-js/store";
 import { WebsocketProvider } from "y-websocket";
+
 import { GraphStore, NodeId, UserStore } from "../data-model/data-type";
 
 export type AwarenessAction =
   | { type: "none" }
   | { type: "inputNode"; nodeId: NodeId; text: string }
   | { type: "moveNode"; nodeId: NodeId; x: number; y: number }
-  | { type: "addEdge"; nodeId: NodeId }
-  | { type: "unlockNode"; nodeId: NodeId };
+  | { type: "addEdge"; nodeId: NodeId };
 
 type AwarenessState = AwarenessAction & {
   userName: string;
@@ -41,62 +41,46 @@ export function makeAwarenessReducer(
     // console.log("receive awareness", states);
 
     const otherUserList: string[] = [];
+    const otherStateMap: Record<
+      /* nodeId */ string,
+      AwarenessState | undefined
+    > = {};
     Object.entries(states).forEach(([clientID, state]) => {
       if (clientID !== String(awareness.clientID)) {
         otherUserList.push(state.userName);
-        switch (state.type) {
-          case "inputNode":
-            updateInputNode(state.userName, state.nodeId, state.text);
-            break;
-          case "moveNode":
-            updateMoveNode(state.userName, state.nodeId, state.x, state.y);
-            break;
-          case "addEdge":
-            updateAddEdgeNode(state.userName, state.nodeId);
-            break;
-          case "unlockNode":
-            unlockNode(state.nodeId);
-            break;
+        if (state.type !== "none") {
+          otherStateMap[state.nodeId] = state;
         }
       }
     });
     setUserStore("otherUserList", otherUserList);
-  }
 
-  function updateInputNode(userName: string, nodeId: NodeId, text: string) {
     setGraphStore(
       "nodeList",
-      (node) => node.id === nodeId,
-      (node) => ({ ...node, lockTitle: `${userName} inputting`, text })
-    );
-  }
-
-  function updateMoveNode(
-    userName: string,
-    nodeId: NodeId,
-    x: number,
-    y: number
-  ) {
-    setGraphStore(
-      "nodeList",
-      (node) => node.id === nodeId,
-      (node) => ({ ...node, lockTitle: `${userName} moving`, x, y })
-    );
-  }
-
-  function updateAddEdgeNode(userName: string, nodeId: NodeId) {
-    setGraphStore(
-      "nodeList",
-      (node) => node.id === nodeId,
-      (node) => ({ ...node, lockTitle: `${userName} adding edge` })
-    );
-  }
-
-  function unlockNode(nodeId: NodeId) {
-    setGraphStore(
-      "nodeList",
-      (node) => node.id === nodeId,
-      (node) => ({ ...node, lockTitle: undefined })
+      produce((nodeList) => {
+        for (const node of nodeList) {
+          const state = otherStateMap[node.id];
+          switch (state?.type) {
+            case "inputNode":
+              node.lockTitle = `${state.userName} inputting`;
+              node.text = state.text;
+              break;
+            case "moveNode":
+              node.lockTitle = `${state.userName} moving`;
+              node.x = state.x;
+              node.y = state.y;
+              break;
+            case "addEdge":
+              node.lockTitle = `${state.userName} adding edge`;
+              break;
+            default:
+              if (node.lockTitle) {
+                node.lockTitle = undefined;
+              }
+              break;
+          }
+        }
+      })
     );
   }
 

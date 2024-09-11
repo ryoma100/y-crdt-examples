@@ -90,7 +90,6 @@ export function makeDataModel(
     if (dragMode() === "dragMove") {
       const node = graphStore.nodeList.find((node) => node.selected);
       if (node) {
-        awarenessDispatch({ type: "unlockNode", nodeId: node.id });
         awarenessDispatch({ type: "none" });
         yjsDispatch({ type: "updateNode", node });
       }
@@ -140,7 +139,6 @@ export function makeDataModel(
         yjsDispatch({ type: "addEdge", edge });
       }
     }
-    awarenessDispatch({ type: "unlockNode", nodeId: line.startNodeId });
     awarenessDispatch({ type: "none" });
     setAddingEdgeLine(null);
   }

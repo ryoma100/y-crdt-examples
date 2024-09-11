@@ -21,9 +21,8 @@ export function Node(props: { node: GraphNode }): JSXElement {
   }
 
   function handleFocusOut() {
-    if (textareaRef == null || readonly()) return;
+    if (textareaRef == null) return;
 
-    awarenessDispatch({ type: "unlockNode", nodeId: props.node.id });
     awarenessDispatch({ type: "none" });
     if (props.node.text !== textareaRef.value) {
       dataModel.updateNodeText(props.node, textareaRef.value);
