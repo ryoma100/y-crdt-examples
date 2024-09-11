@@ -1,6 +1,6 @@
 # y-crdt-editor-examples
 
-<img width="800" alt="y-crdt-editor-examples" src="solid-client/public/y-crdt-editor-examples.png">
+<img width="800" alt="y-crdt-editor-examples" src="y-crdt-editor-examples.png">
 
 ## setup
 
