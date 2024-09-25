@@ -1,24 +1,26 @@
 import {
+  EdgeId,
   GraphEdge,
   GraphNode,
   GraphStore,
   NODE_HEIGHT,
   NODE_WIDTH,
+  NodeId,
   UserStore,
 } from "./data-type";
 
 export function createNode(x: number, y: number): GraphNode {
   return {
-    id: crypto.randomUUID(),
+    id: crypto.randomUUID() as NodeId,
     x,
     y,
     text: "node",
   };
 }
 
-export function createEdge(startNodeId: string, endNodeId: string): GraphEdge {
+export function createEdge(startNodeId: NodeId, endNodeId: NodeId): GraphEdge {
   return {
-    id: crypto.randomUUID(),
+    id: crypto.randomUUID() as EdgeId,
     startNodeId,
     endNodeId,
   };
@@ -35,7 +37,7 @@ export function createSampleGraph(): GraphStore {
   const nodeList = [...Array(5)].flatMap((_, index) => [
     {
       ...createNode(NODE_WIDTH * index + 60, (NODE_HEIGHT + 20) * index + 60),
-      id: `node-${index * 2}`,
+      id: `node-${index * 2}` as NodeId,
       text: `node-${index * 2}`,
     },
     {
@@ -43,7 +45,7 @@ export function createSampleGraph(): GraphStore {
         NODE_WIDTH * (4 - index) + 60,
         (NODE_HEIGHT + 20) * index + 60
       ),
-      id: `node-${index * 2 + 1}`,
+      id: `node-${index * 2 + 1}` as NodeId,
       text: `node-${index * 2 + 1}`,
     },
   ]);

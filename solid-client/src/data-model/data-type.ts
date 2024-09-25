@@ -1,3 +1,5 @@
+type Brand<K, T> = K & { __brand: T };
+
 export type Point = {
   x: number;
   y: number;
@@ -5,8 +7,8 @@ export type Point = {
 
 export type Line = { start: Point; end: Point };
 
-export type NodeId = string;
-export type EdgeId = string;
+export type NodeId = Brand<string, "NodeId">;
+export type EdgeId = Brand<string, "EdgeId">;
 
 export type GraphNode = {
   id: NodeId;
