@@ -9,14 +9,14 @@ import "./diagram.css";
 export function Diagram(): JSXElement {
   const { dataModel } = useGraphContext();
 
-  function handleMouseDown(e: MouseEvent) {
+  function handlePointerDown(e: PointerEvent) {
     dataModel.clearSelect();
     if (dataModel.toolbarMode() === "addNode") {
       dataModel.addNode(e.clientX, e.clientY);
     }
   }
 
-  function handleMouseMove(e: MouseEvent) {
+  function handlePointerMove(e: PointerEvent) {
     if (dataModel.dragMode() !== "none") {
       dataModel.dragMove(e.movementX, e.movementY);
     }
@@ -25,14 +25,16 @@ export function Diagram(): JSXElement {
     }
   }
 
-  function handleMouseUp() {
+  function handlePointerUp(e: PointerEvent) {
     switch (dataModel.toolbarMode()) {
       case "pointer":
       case "addNode":
         dataModel.dragEnd();
         break;
       case "addEdge":
-        dataModel.addEdgeEnd();
+        dataModel.addEdgeEnd(
+          dataModel.findNodeAtPoint({ x: e.clientX, y: e.clientY })
+        );
         break;
     }
   }
@@ -40,9 +42,9 @@ export function Diagram(): JSXElement {
   return (
     <svg
       class="diagram"
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
     >
       <g data-id="edges">
         <For each={dataModel.graphStore.edgeList}>

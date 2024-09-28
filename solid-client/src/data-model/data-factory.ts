@@ -1,3 +1,5 @@
+import { nanoid } from "nanoid";
+
 import {
   EdgeId,
   GraphEdge,
@@ -11,7 +13,7 @@ import {
 
 export function createNode(x: number, y: number): GraphNode {
   return {
-    id: crypto.randomUUID() as NodeId,
+    id: nanoid() as NodeId,
     x,
     y,
     text: "node",
@@ -20,7 +22,7 @@ export function createNode(x: number, y: number): GraphNode {
 
 export function createEdge(startNodeId: NodeId, endNodeId: NodeId): GraphEdge {
   return {
-    id: crypto.randomUUID() as EdgeId,
+    id: nanoid() as EdgeId,
     startNodeId,
     endNodeId,
   };

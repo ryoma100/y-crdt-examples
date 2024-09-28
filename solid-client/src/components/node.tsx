@@ -13,6 +13,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
   function handleDblClick() {
     setReadonly(false);
     textareaRef?.select();
+
     awarenessDispatch({
       type: "inputNode",
       nodeId: props.node.id,
@@ -41,7 +42,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
     }
   }
 
-  function handleMouseDown(e: MouseEvent) {
+  function handlePointerDown(e: PointerEvent) {
     e.stopPropagation();
     e.preventDefault();
     if (!readonly()) return;
@@ -54,12 +55,6 @@ export function Node(props: { node: GraphNode }): JSXElement {
       case "addEdge":
         dataModel.addEdgeStart(props.node);
         break;
-    }
-  }
-
-  function handleMouseUp() {
-    if (dataModel.toolbarMode() === "addEdge") {
-      dataModel.addEdgeEnd(props.node);
     }
   }
 
@@ -98,8 +93,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
             "node--selected": props.node._selected,
             "node--lock": props.node._lockTitle != null,
           }}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
+          onPointerDown={handlePointerDown}
           onDblClick={handleDblClick}
         >
           <textarea
@@ -114,6 +108,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
               width: `${NODE_WIDTH - 6}px`,
               height: `${NODE_HEIGHT - 6}px`,
             }}
+            inputMode="text"
             value={props.node.text}
             readOnly={readonly()}
             disabled={props.node._lockTitle != null}

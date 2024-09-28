@@ -8,7 +8,7 @@ import { bindYjsToStore } from "../yjs-solidjs/yjs-solidjs";
 export function makeYjsProvider(setStore: SetStoreFunction<GraphStore>) {
   const yDoc = new Y.Doc();
   const provider = new WebsocketProvider(
-    "ws://localhost:1234",
+    `ws://${location.hostname}:1234`,
     "graph-example.room-1",
     yDoc
   );

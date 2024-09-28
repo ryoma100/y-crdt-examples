@@ -158,6 +158,19 @@ export function makeDataModel(
     yjsDispatch({ type: "remove", nodeIndex, edgeIndexes: edgeIndexList });
   }
 
+  function findNodeAtPoint(point: Point): GraphNode | undefined {
+    return graphStore.nodeList
+      .slice()
+      .reverse()
+      .find(
+        (node) =>
+          node.x <= point.x &&
+          point.x < node.x + NODE_WIDTH &&
+          node.y <= point.y &&
+          point.y < node.y + NODE_HEIGHT
+      );
+  }
+
   return {
     graphStore,
     setGraphStore,
@@ -178,5 +191,6 @@ export function makeDataModel(
     addEdgeEnd,
     setAddingEdgeLine,
     removeSelected,
+    findNodeAtPoint,
   };
 }

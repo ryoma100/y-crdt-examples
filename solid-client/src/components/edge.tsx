@@ -13,7 +13,7 @@ export function Edge(props: { edge: GraphEdge }): JSXElement {
     nodeList.find((it) => it.id === props.edge.startNodeId)!;
   const toNode = () => nodeList.find((it) => it.id === props.edge.endNodeId)!;
 
-  function handleMouseDown(e: MouseEvent) {
+  function handlePointerDown(e: PointerEvent) {
     e.stopPropagation();
     dataModel.selectEdge(props.edge.id);
   }
@@ -30,7 +30,7 @@ export function Edge(props: { edge: GraphEdge }): JSXElement {
         y1={fromNode().y + NODE_HEIGHT / 2}
         x2={toNode().x + NODE_WIDTH / 2}
         y2={toNode().y + NODE_HEIGHT / 2}
-        onMouseDown={handleMouseDown}
+        onPointerDown={handlePointerDown}
       />
     </>
   );
