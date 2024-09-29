@@ -132,6 +132,7 @@ function UserMenu() {
         ref={inputRef}
         class="user-menu__input"
         type="text"
+        inputMode="text"
         value={userStore.userName}
         onFocusOut={handleUserNameFocusOut}
       />

@@ -1,7 +1,12 @@
-import { JSXElement, Show, createSignal } from "solid-js";
+import { createSignal, JSXElement, Show } from "solid-js";
 
 import { useGraphContext } from "../context";
-import { GraphNode, NODE_HEIGHT, NODE_WIDTH } from "../data-model/data-type";
+import {
+  GraphNode,
+  NODE_HEIGHT,
+  NODE_WIDTH,
+  Point,
+} from "../data-model/data-type";
 
 import "./node.css";
 
@@ -9,43 +14,32 @@ export function Node(props: { node: GraphNode }): JSXElement {
   const { dataModel, awarenessDispatch } = useGraphContext();
 
   const [readonly, setReadonly] = createSignal(true);
-
-  function handleDblClick() {
-    setReadonly(false);
-    textareaRef?.select();
-
-    awarenessDispatch({
-      type: "inputNode",
-      nodeId: props.node.id,
-      text: props.node.text,
-    });
-  }
+  let prevClientPoint: Point = { x: 0, y: 0 };
 
   function handleFocusOut() {
-    if (textareaRef == null) return;
+    if (textareaRef == null) return; // guard
 
     awarenessDispatch({ type: "none" });
     if (props.node.text !== textareaRef.value) {
       dataModel.updateNodeText(props.node, textareaRef.value);
     }
-    setTimeout(() => {
-      // Wait a moment to deselect textarea.
-      textareaRef.setSelectionRange(0, 0);
-      setReadonly(true);
-    }, 0);
+    setReadonly(true);
   }
 
   function handleKeyDown(e: KeyboardEvent) {
+    if (textareaRef == null) return; // guard
+
     if (!readonly() && e.key === "Escape") {
-      e.stopPropagation();
+      textareaRef.setSelectionRange(0, 0);
       handleFocusOut();
     }
   }
 
   function handlePointerDown(e: PointerEvent) {
     e.stopPropagation();
-    e.preventDefault();
     if (!readonly()) return;
+
+    prevClientPoint = { x: e.clientX, y: e.clientY };
 
     switch (dataModel.toolbarMode()) {
       case "pointer":
@@ -58,8 +52,21 @@ export function Node(props: { node: GraphNode }): JSXElement {
     }
   }
 
+  function handlePointerUp(e: PointerEvent) {
+    if (prevClientPoint.x === e.clientX && prevClientPoint.y === e.clientY) {
+      setReadonly(false);
+      textareaRef?.select();
+
+      awarenessDispatch({
+        type: "inputNode",
+        nodeId: props.node.id,
+        text: props.node.text,
+      });
+    }
+  }
+
   function handleInput(_e: InputEvent) {
-    if (textareaRef == null) return;
+    if (textareaRef == null) return; // guard
 
     awarenessDispatch({
       type: "inputNode",
@@ -94,7 +101,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
             "node--lock": props.node._lockTitle != null,
           }}
           onPointerDown={handlePointerDown}
-          onDblClick={handleDblClick}
+          onPointerUp={handlePointerUp}
         >
           <textarea
             ref={textareaRef}
