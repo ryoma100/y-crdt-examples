@@ -16,6 +16,7 @@
 
 .node--lock {
   background-color: gray;
+  cursor: not-allowed;
 }
 
 .node__textarea {

@@ -29,7 +29,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
   function handlePointerDown(e: PointerEvent) {
     e.stopPropagation(); // Required to trigger onPointerMove
 
-    if (readonly()) {
+    if (readonly() && props.node._lockTitle == null) {
       switch (dataModel.toolbarMode()) {
         case "pointer":
         case "addNode":
@@ -46,6 +46,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
     if (!readonly()) return;
 
     if (pointerDownTime + 250 > new Date().getTime()) {
+      // onDoublePointerUp
       setReadonly(false);
       textareaRef.select();
 
@@ -55,6 +56,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
         text: props.node.text,
       });
     } else {
+      // onSinglePointerUp
       pointerDownTime = new Date().getTime();
     }
   }
