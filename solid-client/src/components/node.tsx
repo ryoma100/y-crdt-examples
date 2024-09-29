@@ -1,12 +1,7 @@
 import { createSignal, JSXElement, Show } from "solid-js";
 
 import { useGraphContext } from "../context";
-import {
-  GraphNode,
-  NODE_HEIGHT,
-  NODE_WIDTH,
-  Point,
-} from "../data-model/data-type";
+import { GraphNode, NODE_HEIGHT, NODE_WIDTH } from "../data-model/data-type";
 
 import "./node.css";
 
@@ -14,7 +9,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
   const { dataModel, awarenessDispatch } = useGraphContext();
 
   const [readonly, setReadonly] = createSignal(true);
-  let prevClientPoint: Point = { x: 0, y: 0 };
+  let pointerDownTime = new Date().getTime();
 
   function handleFocusOut() {
     awarenessDispatch({ type: "none" });
@@ -35,8 +30,6 @@ export function Node(props: { node: GraphNode }): JSXElement {
     e.stopPropagation(); // Required to trigger onPointerMove
 
     if (readonly()) {
-      prevClientPoint = { x: e.clientX, y: e.clientY };
-
       switch (dataModel.toolbarMode()) {
         case "pointer":
         case "addNode":
@@ -49,12 +42,10 @@ export function Node(props: { node: GraphNode }): JSXElement {
     }
   }
 
-  function handlePointerUp(e: PointerEvent) {
-    if (
-      readonly() &&
-      prevClientPoint.x === e.clientX &&
-      prevClientPoint.y === e.clientY
-    ) {
+  function handlePointerUp(_e: PointerEvent) {
+    if (!readonly()) return;
+
+    if (pointerDownTime + 250 > new Date().getTime()) {
       setReadonly(false);
       textareaRef.select();
 
@@ -63,6 +54,8 @@ export function Node(props: { node: GraphNode }): JSXElement {
         nodeId: props.node.id,
         text: props.node.text,
       });
+    } else {
+      pointerDownTime = new Date().getTime();
     }
   }
 
@@ -97,6 +90,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
           class="node"
           classList={{
             "node--selected": props.node._selected,
+            "node--readonly": readonly(),
             "node--lock": props.node._lockTitle != null,
           }}
           onPointerDown={handlePointerDown}
@@ -116,7 +110,6 @@ export function Node(props: { node: GraphNode }): JSXElement {
             }}
             inputMode="text"
             value={props.node.text}
-            readOnly={readonly()}
             disabled={props.node._lockTitle != null}
             onKeyDown={handleKeyDown}
             onFocusOut={handleFocusOut}
