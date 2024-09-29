@@ -121,15 +121,15 @@ function UserMenu() {
   const { awarenessDispatch, userStore, setUserStore } = useGraphContext();
 
   function handleUserNameFocusOut(_e: Event) {
-    setUserStore("userName", inputRef?.value ?? "");
+    setUserStore("userName", inputRef.value);
     awarenessDispatch({ type: "none" });
   }
 
-  let inputRef: HTMLInputElement | undefined;
+  let inputRef: HTMLInputElement;
   return (
     <div class="user-menu">
       <input
-        ref={inputRef}
+        ref={inputRef!}
         class="user-menu__input"
         type="text"
         inputMode="text"

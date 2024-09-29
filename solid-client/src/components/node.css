@@ -17,6 +17,7 @@
 .node__textarea {
   margin: 1px;
   padding: 4px;
+  font-size: 12px;
   overflow: hidden;
   resize: none;
 }

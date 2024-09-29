@@ -17,8 +17,6 @@ export function Node(props: { node: GraphNode }): JSXElement {
   let prevClientPoint: Point = { x: 0, y: 0 };
 
   function handleFocusOut() {
-    if (textareaRef == null) return; // guard
-
     awarenessDispatch({ type: "none" });
     if (props.node.text !== textareaRef.value) {
       dataModel.updateNodeText(props.node, textareaRef.value);
@@ -27,8 +25,6 @@ export function Node(props: { node: GraphNode }): JSXElement {
   }
 
   function handleKeyDown(e: KeyboardEvent) {
-    if (textareaRef == null) return; // guard
-
     if (!readonly() && e.key === "Escape") {
       textareaRef.setSelectionRange(0, 0);
       handleFocusOut();
@@ -36,26 +32,31 @@ export function Node(props: { node: GraphNode }): JSXElement {
   }
 
   function handlePointerDown(e: PointerEvent) {
-    e.stopPropagation();
-    if (!readonly()) return;
+    e.stopPropagation(); // Required to trigger onPointerMove
 
-    prevClientPoint = { x: e.clientX, y: e.clientY };
+    if (readonly()) {
+      prevClientPoint = { x: e.clientX, y: e.clientY };
 
-    switch (dataModel.toolbarMode()) {
-      case "pointer":
-      case "addNode":
-        dataModel.dragStart(props.node.id);
-        break;
-      case "addEdge":
-        dataModel.addEdgeStart(props.node);
-        break;
+      switch (dataModel.toolbarMode()) {
+        case "pointer":
+        case "addNode":
+          dataModel.dragStart(props.node.id);
+          break;
+        case "addEdge":
+          dataModel.addEdgeStart(props.node);
+          break;
+      }
     }
   }
 
   function handlePointerUp(e: PointerEvent) {
-    if (prevClientPoint.x === e.clientX && prevClientPoint.y === e.clientY) {
+    if (
+      readonly() &&
+      prevClientPoint.x === e.clientX &&
+      prevClientPoint.y === e.clientY
+    ) {
       setReadonly(false);
-      textareaRef?.select();
+      textareaRef.select();
 
       awarenessDispatch({
         type: "inputNode",
@@ -66,8 +67,6 @@ export function Node(props: { node: GraphNode }): JSXElement {
   }
 
   function handleInput(_e: InputEvent) {
-    if (textareaRef == null) return; // guard
-
     awarenessDispatch({
       type: "inputNode",
       nodeId: props.node.id,
@@ -75,7 +74,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
     });
   }
 
-  let textareaRef: HTMLTextAreaElement | undefined;
+  let textareaRef: HTMLTextAreaElement;
   return (
     <>
       <Show when={props.node._lockTitle != null}>
@@ -104,7 +103,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
           onPointerUp={handlePointerUp}
         >
           <textarea
-            ref={textareaRef}
+            ref={textareaRef!}
             name="textarea"
             class="node__textarea"
             classList={{
