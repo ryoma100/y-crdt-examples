@@ -1,7 +1,7 @@
 import * as Y from "yjs";
 
-import { GraphEdge, GraphNode } from "../data-model/data-type";
-import { convertYMap } from "../yjs-solidjs/yjs-solidjs";
+import { GraphEdge, GraphNode } from "../data-store/data-type";
+import { convertYMap } from "../utils/yjs-solidjs";
 
 export type YjsAction =
   | { type: "addNode"; node: GraphNode }

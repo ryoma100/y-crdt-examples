@@ -1,7 +1,7 @@
 import { JSXElement } from "solid-js";
 
 import { useGraphContext } from "../context";
-import { GraphEdge, NODE_HEIGHT, NODE_WIDTH } from "../data-model/data-type";
+import { GraphEdge, NODE_HEIGHT, NODE_WIDTH } from "../data-store/data-type";
 
 import "./edge.css";
 

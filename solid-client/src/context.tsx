@@ -1,40 +1,30 @@
 import { createContext, useContext } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
-import { createStore } from "solid-js/store";
-import {
-  createDefaultGraph,
-  createDefaultUser,
-} from "./data-model/data-factory";
 import { makeDataModel } from "./data-model/data-model";
-import { GraphStore, UserStore } from "./data-model/data-type";
-import { makeAwarenessReducer } from "./data-reducer/awareness-reducer";
-import { makeYjsProvider } from "./data-reducer/yjs-provider";
-import { makeYjsReducer } from "./data-reducer/yjs-reducer";
+import { makeDataStore } from "./data-store/data-store";
+import { makeAwarenessReducer } from "./data-yjs/awareness-reducer";
+import { makeYjsProvider } from "./data-yjs/yjs-provider";
+import { makeYjsReducer } from "./data-yjs/yjs-reducer";
 
-const [graphStore, setGraphStore] = createStore<GraphStore>(
-  createDefaultGraph()
-);
-const [userStore, setUserStore] = createStore<UserStore>(createDefaultUser());
-
-const yjsProvider = makeYjsProvider(setGraphStore);
+const dataStore = makeDataStore();
+const yjsProvider = makeYjsProvider(dataStore.setGraphStore);
 const yjsReducer = makeYjsReducer(yjsProvider.yRoot);
 const awarenessReducer = makeAwarenessReducer(
   yjsProvider.provider,
-  userStore,
-  setGraphStore,
-  setUserStore
+  dataStore.userStore,
+  dataStore.setGraphStore,
+  dataStore.setUserStore
 );
 awarenessReducer.login();
 const dataModel = makeDataModel(
-  graphStore,
+  dataStore.graphStore,
   yjsReducer.dispatch,
   awarenessReducer.dispatch,
-  setGraphStore
+  dataStore.setGraphStore
 );
 const contextValue = {
   dataModel,
-  userStore,
-  setUserStore,
+  dataStore,
   yjsDispatch: yjsReducer.dispatch,
   awarenessDispatch: awarenessReducer.dispatch,
   connect: () => {

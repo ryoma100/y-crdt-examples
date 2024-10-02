@@ -1,7 +1,7 @@
 import { createSignal, JSXElement, Show } from "solid-js";
 
 import { useGraphContext } from "../context";
-import { GraphNode, NODE_HEIGHT, NODE_WIDTH } from "../data-model/data-type";
+import { GraphNode, NODE_HEIGHT, NODE_WIDTH } from "../data-store/data-type";
 
 import "./node.css";
 

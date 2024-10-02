@@ -1,9 +1,7 @@
 import { batch, createSignal } from "solid-js";
 
 import { SetStoreFunction } from "solid-js/store";
-import { AwarenessAction } from "../data-reducer/awareness-reducer";
-import { YjsAction } from "../data-reducer/yjs-reducer";
-import { createEdge, createNode } from "./data-factory";
+import { createEdge, createNode } from "../data-store/data-factory";
 import {
   EdgeId,
   GraphNode,
@@ -12,7 +10,9 @@ import {
   NODE_WIDTH,
   NodeId,
   Point,
-} from "./data-type";
+} from "../data-store/data-type";
+import { AwarenessAction } from "../data-yjs/awareness-reducer";
+import { YjsAction } from "../data-yjs/yjs-reducer";
 
 export type ToolbarMode = "pointer" | "addNode" | "addEdge";
 export type DragMode = "none" | "dragStart" | "dragMove";

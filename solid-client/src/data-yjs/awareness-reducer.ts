@@ -1,7 +1,7 @@
 import { produce, SetStoreFunction } from "solid-js/store";
 import { WebsocketProvider } from "y-websocket";
 
-import { GraphStore, NodeId, UserStore } from "../data-model/data-type";
+import { GraphStore, NodeId, UserStore } from "../data-store/data-type";
 
 export type AwarenessAction =
   | { type: "none" }

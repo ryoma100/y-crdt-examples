@@ -1,7 +1,7 @@
 import { createSignal, For } from "solid-js";
 import { useGraphContext } from "../context";
 
-import { createSampleGraph } from "../data-model/data-factory";
+import { createSampleGraph } from "../data-store/data-factory";
 import "./tool-menu.css";
 
 export function ToolMenu() {
@@ -118,10 +118,10 @@ function DrawMenu() {
 }
 
 function UserMenu() {
-  const { awarenessDispatch, userStore, setUserStore } = useGraphContext();
+  const { awarenessDispatch, dataStore } = useGraphContext();
 
   function handleUserNameFocusOut(_e: Event) {
-    setUserStore("userName", inputRef.value);
+    dataStore.setUserStore("userName", inputRef.value);
     awarenessDispatch({ type: "none" });
   }
 
@@ -133,10 +133,10 @@ function UserMenu() {
         class="user-menu__input"
         type="text"
         inputMode="text"
-        value={userStore.userName}
+        value={dataStore.userStore.userName}
         onFocusOut={handleUserNameFocusOut}
       />
-      <For each={userStore.otherUserList}>
+      <For each={dataStore.userStore.otherUserList}>
         {(userName) => <div class="user-menu__label">{userName}</div>}
       </For>
     </div>

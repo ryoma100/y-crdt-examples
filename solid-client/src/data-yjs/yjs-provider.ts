@@ -2,8 +2,8 @@ import { SetStoreFunction } from "solid-js/store";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
-import { GraphEdge, GraphNode, GraphStore } from "../data-model/data-type";
-import { bindYjsToStore } from "../yjs-solidjs/yjs-solidjs";
+import { GraphEdge, GraphNode, GraphStore } from "../data-store/data-type";
+import { bindYjsToStore } from "../utils/yjs-solidjs";
 
 export function makeYjsProvider(setStore: SetStoreFunction<GraphStore>) {
   const yDoc = new Y.Doc();
