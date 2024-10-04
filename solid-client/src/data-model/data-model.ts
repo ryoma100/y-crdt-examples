@@ -30,6 +30,7 @@ export function makeDataModel(
     startPoint: Point;
     endPoint: Point;
   } | null>(null);
+  let prevPoint: Point = { x: 0, y: 0 };
 
   function selectNode(nodeId: NodeId) {
     batch(() => {
@@ -58,22 +59,24 @@ export function makeDataModel(
     yjsDispatch({ type: "updateNode", node: { ...node, text } });
   }
 
-  function dragStart(nodeId: NodeId) {
+  function dragStart(nodeId: NodeId, clientX: number, clientY: number) {
     selectNode(nodeId);
     setDragMode("dragStart");
+    prevPoint = { x: clientX, y: clientY };
   }
 
-  function dragMove(movementX: number, movementY: number) {
+  function dragMove(clientX: number, clientY: number) {
     setDragMode("dragMove");
     setGraphStore(
       "nodeList",
       (node) => !!node._selected,
       (node) => ({
         ...node,
-        x: node.x + movementX,
-        y: node.y + movementY,
+        x: node.x + clientX - prevPoint.x,
+        y: node.y + clientY - prevPoint.y,
       })
     );
+    prevPoint = { x: clientX, y: clientY };
 
     const node = graphStore.nodeList.find((it) => it._selected);
     if (node) {

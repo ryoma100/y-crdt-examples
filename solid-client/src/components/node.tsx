@@ -33,7 +33,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
       switch (dataModel.toolbarMode()) {
         case "pointer":
         case "addNode":
-          dataModel.dragStart(props.node.id);
+          dataModel.dragStart(props.node.id, e.clientX, e.clientY);
           break;
         case "addEdge":
           dataModel.addEdgeStart(props.node);

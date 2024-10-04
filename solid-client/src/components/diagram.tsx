@@ -18,7 +18,7 @@ export function Diagram(): JSXElement {
 
   function handlePointerMove(e: PointerEvent) {
     if (dataModel.dragMode() !== "none") {
-      dataModel.dragMove(e.movementX, e.movementY);
+      dataModel.dragMove(e.clientX, e.clientY);
     }
     if (dataModel.addingEdgeLine() != null) {
       dataModel.addEdgeMove(e.clientX, e.clientY);
