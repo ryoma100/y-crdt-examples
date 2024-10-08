@@ -18,6 +18,7 @@ export function Diagram(): JSXElement {
 
   function handlePointerMove(e: PointerEvent) {
     if (dataModel.dragMode() !== "none") {
+      // e.movementX/Y is not used because the value is doubled by Apple Pencil
       dataModel.dragMove(e.clientX, e.clientY);
     }
     if (dataModel.addingEdgeLine() != null) {
