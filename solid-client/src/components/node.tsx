@@ -9,7 +9,6 @@ export function Node(props: { node: GraphNode }): JSXElement {
   const { dataModel, awarenessDispatch } = useGraphContext();
 
   const [readonly, setReadonly] = createSignal(true);
-  let pointerDownTime = new Date().getTime();
 
   function handleFocusOut() {
     awarenessDispatch({ type: "none" });
@@ -42,23 +41,17 @@ export function Node(props: { node: GraphNode }): JSXElement {
     }
   }
 
-  function handlePointerUp(_e: PointerEvent) {
+  function handleDblClick(_e: MouseEvent) {
     if (!readonly()) return;
 
-    if (pointerDownTime + 250 > new Date().getTime()) {
-      // onDoublePointerUp
-      setReadonly(false);
-      textareaRef.select();
+    setReadonly(false);
+    textareaRef.select();
 
-      awarenessDispatch({
-        type: "inputNode",
-        nodeId: props.node.id,
-        text: props.node.text,
-      });
-    } else {
-      // onSinglePointerUp
-      pointerDownTime = new Date().getTime();
-    }
+    awarenessDispatch({
+      type: "inputNode",
+      nodeId: props.node.id,
+      text: props.node.text,
+    });
   }
 
   function handleInput(_e: InputEvent) {
@@ -96,7 +89,7 @@ export function Node(props: { node: GraphNode }): JSXElement {
             "node--lock": props.node._lockTitle != null,
           }}
           onPointerDown={handlePointerDown}
-          onPointerUp={handlePointerUp}
+          onDblClick={handleDblClick}
         >
           <textarea
             ref={textareaRef!}

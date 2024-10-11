@@ -44,7 +44,7 @@ export function Diagram(): JSXElement {
     <svg
       class="diagram"
       onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
+      onPointerMove={handlePointerMove} // TODO: passive
       onPointerUp={handlePointerUp}
     >
       <g data-id="edges">
